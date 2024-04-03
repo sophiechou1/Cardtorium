@@ -31,6 +31,7 @@ var current_player: int = 0
 var turns: int = 0
 
 ## Array which stores the position of buildings.
+## Cities are included in this array.
 var buildings: Array = []
 
 ## The size of the board (in tiles) encoded as a vector
@@ -69,10 +70,10 @@ func setup(wid: int, height: int, _num_players: int):
 		card1, card2, card3,
 		card1, card2, card3,
 	]
-	players.append(Player.new(SIZE, Vector2i(0,SIZE.y / 2), deck))
-	players.append(Player.new(SIZE, Vector2i(SIZE.x - 1,SIZE.y / 2), deck))
+	players.append(Player.new(SIZE, deck))
+	players.append(Player.new(SIZE, deck))
+	# Vector2i(0,SIZE.y / 2), 
+	# Vector2i(SIZE.x - 1,SIZE.y / 2), 
 	# TODO the name should be read from somewhere else, maybe the main menu
 	players[0].name = "Player_0"
-	players[0].local_id = 0
-	players[1].local_id = 1
 	players[1].name = "Player_1"

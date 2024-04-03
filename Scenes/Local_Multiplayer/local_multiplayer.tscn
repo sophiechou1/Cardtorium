@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://cpjc8y8la6h8n"]
+[gd_scene load_steps=26 format=3 uid="uid://cpjc8y8la6h8n"]
 
 [ext_resource type="Script" path="res://Classes/game.gd" id="1_cv5ps"]
 [ext_resource type="Script" path="res://Scenes/Local_Multiplayer/local_multiplayer.gd" id="1_w84yu"]
@@ -13,6 +13,8 @@
 [ext_resource type="Script" path="res://Scenes/Local_Multiplayer/MoveRender.gd" id="11_0mh2y"]
 [ext_resource type="Texture2D" uid="uid://bfwcvluxqghk2" path="res://Assets/Tiles/thick-outline.png" id="11_bs2bu"]
 [ext_resource type="Script" path="res://Scenes/Local_Multiplayer/FogRenderer.gd" id="11_i2gk8"]
+[ext_resource type="Texture2D" uid="uid://be23a1x2ski3m" path="res://Assets/Tiles/territory_0.png" id="14_xbgac"]
+[ext_resource type="Texture2D" uid="uid://bbbd3sx1ju4on" path="res://Assets/Tiles/territory_1.png" id="15_8kp7k"]
 
 [sub_resource type="TileSet" id="TileSet_m82yt"]
 
@@ -381,6 +383,21 @@ sources/0 = SubResource("TileSetAtlasSource_quc2k")
 sources/1 = SubResource("TileSetAtlasSource_2u6sa")
 sources/2 = SubResource("TileSetAtlasSource_8ng1c")
 
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_abia4"]
+texture = ExtResource("14_xbgac")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0ta1l"]
+texture = ExtResource("15_8kp7k")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_lx3aq"]
+tile_size = Vector2i(64, 64)
+sources/0 = SubResource("TileSetAtlasSource_abia4")
+sources/1 = SubResource("TileSetAtlasSource_0ta1l")
+
 [node name="LocalMultiplayer" type="Node2D"]
 z_index = 10
 script = ExtResource("1_w84yu")
@@ -473,6 +490,10 @@ tile_set = SubResource("TileSet_yjrn2")
 format = 2
 layer_0/z_index = 9
 script = ExtResource("11_0mh2y")
+
+[node name="TerritoryRenderer" type="TileMap" parent="."]
+tile_set = SubResource("TileSet_lx3aq")
+format = 2
 
 [connection signal="render_topbar" from="Game" to="GUI_Renderer/Control/TopBar/ColorRect/RichTextLabel" method="_on_game_render_topbar"]
 [connection signal="terrain_updated" from="Game" to="TerrainRenderer" method="render"]

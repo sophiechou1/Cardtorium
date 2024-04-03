@@ -31,6 +31,10 @@ func _ready():
 	var width = 11
 	var height = 11
 	board.setup(width, height, 2)
+	# for i in range(len(board.players)):
+	# 	board.players[i].setup()
+	board.players[0].setup(self, Vector2i(0,board.SIZE.y / 2), 0)
+	board.players[1].setup(self,Vector2i(board.SIZE.x - 1,board.SIZE.y / 2), 1)
 	num_players = 2
 	render_topbar.emit(board.turns, board.players[board.current_player])
 
@@ -73,6 +77,28 @@ func end_turn():
 	# Sets next player up to begin their turn
 	render_topbar.emit(board.turns, board.current_player)
 	board.players[board.current_player].begin_turn()
+
+
+## Claims territory in a radius for a player.
+## Passing a -1 for the player parameter will unclaim territory.
+## If a player is not passed, defaults to current player
+func claim_territory(pos: Vector2i, radius: int, player: int = -2):
+	if player == -2:
+		player = board.current_player
+	# Renders territory
+	var thing = get_node("../TerritoryRenderer")
+	for x in range(pos.x - radius, pos.x + radius + 1):
+		if x < 0:
+			continue
+		elif x >= board.SIZE.x:
+			break
+		for y in range(pos.y - radius, pos.y + radius + 1):
+			if y < 0:
+				continue
+			elif y >= board.SIZE.y:
+				break
+			board.territory[x][y] = player
+			thing.set_cell(0, Vector2i(x, y), player, Vector2i.ZERO)
 
 
 ## Moves a troop from one position to another.
