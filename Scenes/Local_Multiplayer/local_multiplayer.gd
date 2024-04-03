@@ -95,3 +95,7 @@ func render_troop(troop: Troop, pos: Vector2i):
 	instance.prepare_for_render(troop, game)
 	instance.position = Vector2(pos) * TILE_SIZE
 	add_child.call_deferred(instance)
+
+
+func render_city(city: City):
+	add_child.call_deferred(city)

@@ -495,6 +495,7 @@ script = ExtResource("11_0mh2y")
 tile_set = SubResource("TileSet_lx3aq")
 format = 2
 
+[connection signal="city_placed" from="Game" to="." method="render_city"]
 [connection signal="render_topbar" from="Game" to="GUI_Renderer/Control/TopBar/ColorRect/RichTextLabel" method="_on_game_render_topbar"]
 [connection signal="terrain_updated" from="Game" to="TerrainRenderer" method="render"]
 [connection signal="troop_placed" from="Game" to="." method="render_troop"]

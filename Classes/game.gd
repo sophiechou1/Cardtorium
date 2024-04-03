@@ -23,6 +23,8 @@ signal troop_moved(troop: Troop, path: Array)
 signal unit_removed(unit: Unit)
 ## Emitted right before (or maybe after) player's turn switches over
 signal render_topbar(turn: int, player: Player)
+## Emitted when a city is placed
+signal city_placed(city: City)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -121,3 +123,13 @@ func troop_move(troop: Troop, tile: Vector2i):
 func remove_unit(unit: Unit):
 	board.units[unit.pos.x][unit.pos.y] = null
 	unit_removed.emit(unit)
+
+
+## Places a city
+func place_city(pos: Vector2i):
+	if board.buildings[pos.x][pos.y] != null:
+		return
+	var city: City = City.new()
+	city.position = 64 * pos
+	board.buildings[pos.x][pos.y] = city
+	city_placed.emit(city)

@@ -44,6 +44,7 @@ func setup(wid: int, height: int, _num_players: int):
 	tiles.resize(wid)
 	territory.resize(wid)
 	units.resize(wid)
+	buildings.resize(wid)
 	for x in range(wid):
 		# Sets the tiles
 		tiles[x] = []
@@ -57,6 +58,10 @@ func setup(wid: int, height: int, _num_players: int):
 		units[x] = []
 		units[x].resize(height)
 		units[x].fill(null)
+		# Sets the buildings array
+		buildings[x] = []
+		buildings[x].resize(height)
+		buildings[x].fill(null)
 	players = []
 	# TODO: Replace code below, and actually use the `num_players` variable
 	var card1: Card = load('res://Cards/Troops/troop_1.tres')
