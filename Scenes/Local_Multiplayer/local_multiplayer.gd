@@ -34,6 +34,7 @@ func _ready():
 	camera.selected_tile.connect(self.on_selected_tile)
 	hand_renderer.card_selected.connect(self.on_card_selected)
 
+
 func on_card_selected(card_index: int):
 	selected_index = card_index
 		

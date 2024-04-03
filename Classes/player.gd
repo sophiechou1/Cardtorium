@@ -71,7 +71,7 @@ func begin_turn():
         drawn.append(card)
         self.hand.append(card)
     # Lets the renderer know that it can do its thing
-    self.cards_drawn.emit(drawn)
+    self.cards_drawn.emit(self.hand)
 
 ## Clears the fog from an array of tiles
 func clear_fog(tiles: Array[Vector2i]):

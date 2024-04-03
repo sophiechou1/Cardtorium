@@ -516,6 +516,8 @@ script = ExtResource("11_0mh2y")
 
 [connection signal="terrain_updated" from="Game" to="TerrainRenderer" method="render"]
 [connection signal="troop_placed" from="Game" to="." method="render_troop"]
+[connection signal="turn_ended" from="Game" to="GUI_Renderer/HandRenderer" method="switch_hands"]
+[connection signal="turn_ended" from="Game" to="FogRenderer" method="switch_players"]
 [connection signal="mouse_entered" from="GUI_Renderer/HandRenderer" to="Camera2D" method="_on_hand_renderer_mouse_entered"]
 [connection signal="mouse_exited" from="GUI_Renderer/HandRenderer" to="Camera2D" method="_on_hand_renderer_mouse_exited"]
 [connection signal="pressed" from="GUI_Renderer/ActionBar/MarginContainer/ColorRect/MarginContainer/HBoxContainer/Button3" to="Game" method="end_turn"]

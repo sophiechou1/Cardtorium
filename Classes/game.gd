@@ -57,20 +57,23 @@ func place_from_hand(index: int, x: int, y: int):
 
 ## Goes to the next player's turn
 func end_turn():
-	# Lets other nodes know that a player has ended their turn
-	turn_ended.emit(board.current_player)
+	var prev = board.current_player
 	# Updates current_player
 	board.current_player += 1
 	if board.current_player == num_players:
 		board.current_player = 0
 		board.turns += 1
 	# Sets next player up to begin their turn
+	board.players[board.current_player].begin_turn()
+	
+	# Lets other nodes know that a player has ended their turn
+	turn_ended.emit(prev, board.players[board.current_player])
 
 	print("end turn clicked")
 	print(board.current_player)
 	print(board.turns)
 
-	board.players[board.current_player].begin_turn()
+	
 
 ## Moves a troop from one position to another.
 ## WARNING: If the move is invalid, then this function will throw
