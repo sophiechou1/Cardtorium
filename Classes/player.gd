@@ -69,6 +69,7 @@ func setup(game: Game, base_position: Vector2i, index: int):
 	game.claim_territory(base_position, 1, index)
 	# Places home base
 	game.place_city(base_position)
+	cities = 1
 
 ## Called right before the player's turn begins
 func begin_turn():

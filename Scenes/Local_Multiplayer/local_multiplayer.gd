@@ -82,6 +82,11 @@ func check_and_place_card():
 			if tile_content != null and tile_content is Troop:
 				# Troop already exists on the selected tile, don't allow card placement
 				return
+			if not game.board.buildings[selected_tile.x][selected_tile.y] is City:
+				return
+			var current_player = game.board.current_player
+			if not game.board.territory[selected_tile.x][selected_tile.y] == current_player:
+				return
 			game.place_from_hand(selected_index, selected_tile.x, selected_tile.y)
 			selected_index = -1
 			selected_tile = Vector2i()
