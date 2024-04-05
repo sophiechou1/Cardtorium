@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://cpjc8y8la6h8n"]
+[gd_scene load_steps=27 format=3 uid="uid://cpjc8y8la6h8n"]
 
 [ext_resource type="Script" path="res://Classes/game.gd" id="1_cv5ps"]
 [ext_resource type="Script" path="res://Scenes/Local_Multiplayer/local_multiplayer.gd" id="1_w84yu"]
