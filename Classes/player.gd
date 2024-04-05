@@ -62,18 +62,18 @@ func _init(board_size: Vector2i, start_location: Vector2i, _deck: Array[Card]):
 ## Called right before the player's turn begins
 func begin_turn():
     # Increments resources
-    resources += rpt
+	resources += rpt
     # Sets hand size
-    hand_size = max(hand_size, cities)
+	hand_size = max(hand_size, cities)
     # Draws cards until the hand is full
-    var current_hand_size = len(hand)
-    var drawn: Array[Card] = []
-    for i in range(current_hand_size, hand_size):
-        var card: Card = deck.pop_front()
-        drawn.append(card)
-        self.hand.append(card)
+	var current_hand_size = len(hand)
+	var drawn: Array[Card] = []
+	for i in range(current_hand_size, hand_size):
+		var card: Card = deck.pop_front()
+		drawn.append(card)
+		self.hand.append(card)
     # Lets the renderer know that it can do its thing
-    self.cards_drawn.emit(self.hand)
+	self.cards_drawn.emit(self.hand)
 
 ## Clears the fog from an array of tiles
 func clear_fog(tiles: Array[Vector2i]):
