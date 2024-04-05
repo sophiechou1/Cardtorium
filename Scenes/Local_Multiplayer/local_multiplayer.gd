@@ -11,7 +11,7 @@ signal card_placed(card_index: int)
 @onready var move_renderer = $MoveRender
 @onready var hand_renderer = $GUI_Renderer/HandRenderer
 #@onready var ter_renderer = $TerrainRenderer
-var active_unit = null
+var active_unit: Unit = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -74,11 +74,15 @@ func on_selected_tile(pos: Vector2i):
 			return
 		elif selected_tile not in active_unit.move_graph:
 			return
-		# Clears the move outlines
-		move_renderer.clear_move_outlines()
 		if active_unit is Troop: 
 			game.troop_move(active_unit, selected_tile)
-			active_unit = null
+		deselect_unit()
+
+func deselect_unit():
+	# Clears the move outlines
+	move_renderer.clear_move_outlines()
+	active_unit = null
+
 
 ## Must first select card to place on a tile
 func check_and_place_card():
@@ -110,3 +114,11 @@ func render_troop(troop: Troop, pos: Vector2i):
 
 func render_city(city: City):
 	add_child.call_deferred(city)
+
+
+func claim_territory():
+	if active_unit == null:
+		return
+	if active_unit.owned_by == game.board.territory[active_unit.pos.x][active_unit.pos.y]:
+		game.claim_territory(active_unit.pos, 1, active_unit.owned_by)
+	deselect_unit()

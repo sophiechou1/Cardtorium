@@ -25,6 +25,8 @@ signal unit_removed(unit: Unit)
 signal render_topbar(turn: int, player: Player)
 ## Emitted when a city is placed
 signal city_placed(city: City)
+## Emitted when a player claims territory
+signal territory_claimed(claimed: Array[Vector2i], player_index: int)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -91,8 +93,8 @@ func end_turn():
 func claim_territory(pos: Vector2i, radius: int, player: int = -2):
 	if player == -2:
 		player = board.current_player
-	# Renders territory
-	var thing = get_node("../TerritoryRenderer")
+	# Claims territory
+	var claimed: Array[Vector2i] = []
 	for x in range(pos.x - radius, pos.x + radius + 1):
 		if x < 0:
 			continue
@@ -104,7 +106,9 @@ func claim_territory(pos: Vector2i, radius: int, player: int = -2):
 			elif y >= board.SIZE.y:
 				break
 			board.territory[x][y] = player
-			thing.set_cell(0, Vector2i(x, y), player, Vector2i.ZERO)
+			claimed.append(Vector2i(x, y))
+	# Emits signal
+	territory_claimed.emit(claimed, player)
 
 
 ## Moves a troop from one position to another.
