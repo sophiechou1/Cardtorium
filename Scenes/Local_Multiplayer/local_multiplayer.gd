@@ -49,6 +49,8 @@ func on_selected_tile(pos: Vector2i):
 
 	var tile_content = game.board.units[selected_tile.x][selected_tile.y]
 	if tile_content != null and tile_content is Troop and active_unit == null:
+		if tile_content.owned_by != game.board.current_player:
+			return
 		var troop = tile_content as Troop
 		troop.build_graph(selected_tile.x, selected_tile.y, game.board)
 		move_renderer.clear_move_outlines() # Clear previous move outlines
@@ -57,6 +59,8 @@ func on_selected_tile(pos: Vector2i):
 	elif tile_content != null and tile_content is Troop:
 		# defender
 		var troop = tile_content as Troop
+		if troop.owned_by == game.board.current_player:
+			return
 		var dist = floor(Vector2(active_unit.pos).distance_to(Vector2(troop.pos)))
 		
 		if dist <= active_unit.rng:
