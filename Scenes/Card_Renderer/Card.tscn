@@ -222,10 +222,10 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="Focus" type="TextureButton" parent="."]
+modulate = Color(1, 1, 1, 0)
 layout_mode = 2
-toggle_mode = true
 keep_pressed_outside = true
-texture_pressed = ExtResource("9_ucqcp")
+texture_normal = ExtResource("9_ucqcp")
 stretch_mode = 0
 
 [connection signal="mouse_entered" from="Focus" to="." method="_on_focus_mouse_entered"]

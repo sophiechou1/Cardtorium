@@ -28,12 +28,12 @@ func render_cards(hand: Array[Card]):
 		card_node.queue_free()
 	cards.clear()
 	
-	print("CARDS:", cards)
-	print("HAND:", hand)
+	# print("CARDS:", cards)
+	# print("HAND:", hand)
 	var num_cards = len(hand)
 	var increment = float(XBOUND[1] - XBOUND[0]) / num_cards
 	var xpos = XBOUND[0] + increment / 2
-	print("NUM_CARDS:", num_cards)
+	# print("NUM_CARDS:", num_cards)
 	for i in range(num_cards):
 		var card = hand[i]
 		var rendered = card_scene.instantiate()
@@ -62,23 +62,22 @@ func on_card_clicked(card_index: int):
 		deselect_card(card_index)
 	else:
 		card_history.append(card_index)
-		select_card(card_index)
+		if card_history.size() > 1:
+			deselect_card(card_history.pop_front())
 
-func select_card(card_index: int):
-	if card_history.size() > 1:
-		deselect_card(card_history.pop_front())
-
-	cards[card_index].is_selected = true
-	cards[card_index].get_node("Focus").modulate.a = 1
-	cards[card_index].position.y = (YPOS - (cardsize.y * 0.12) / 2) - 100
-	cards[card_index].z_index = 1
-	card_selected.emit(card_index)
+		cards[card_index].get_node("Focus").modulate.a = 1
+		cards[card_index].is_selected = true
+		cards[card_index].position.y = (YPOS - (cardsize.y * 0.12) / 2) - 100
+		cards[card_index].z_index = 1
+		card_selected.emit(card_index)
 
 func deselect_card(card_index: int):
-	cards[card_index].is_selected = false
-	cards[card_index].get_node("Focus").modulate.a = 0
-	cards[card_index].z_index = 0
-	cards[card_index].position.y = YPOS - (cardsize.y * 0.12) / 2
+	if card_index < len(cards):
+		cards[card_index].get_node("Focus").modulate.a = 0
+
+		cards[card_index].is_selected = false
+		cards[card_index].z_index = 0
+		cards[card_index].position.y = YPOS - (cardsize.y * 0.12) / 2
 
 ## Removes a card from the player's hand
 func remove_cards(old_hand: Array[Card], new_hand: Array[Card]):
@@ -92,8 +91,6 @@ func setup_card(rendered, pos, scale, size):
 	rendered.scale.x = scale
 	rendered.scale.y = scale
 
-
 func switch_hands(prev: int, curr: Player):
 	print(curr.hand)
 	self.render_cards(curr.hand)
-
