@@ -57,6 +57,10 @@ func on_selected_tile(pos: Vector2i):
 	elif tile_content != null and tile_content is Troop:
 		# defender
 		var troop = tile_content as Troop
+		if troop == active_unit:
+			move_renderer.clear_move_outlines()
+			active_unit = null
+			return
 		var dist = floor(Vector2(active_unit.pos).distance_to(Vector2(troop.pos)))
 		
 		if dist <= active_unit.rng:
@@ -67,9 +71,14 @@ func on_selected_tile(pos: Vector2i):
 	elif active_unit != null:
 		# Checks if the move is valid
 		if active_unit.move_graph == null:
+			move_renderer.clear_move_outlines()
+			active_unit = null
 			return
 		elif selected_tile not in active_unit.move_graph:
+			move_renderer.clear_move_outlines()
+			active_unit = null
 			return
+		
 		# Clears the move outlines
 		move_renderer.clear_move_outlines()
 		if active_unit is Troop: 
