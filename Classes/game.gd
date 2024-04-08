@@ -72,6 +72,13 @@ func end_turn():
 	
 	# Lets other nodes know that a player has ended their turn
 	turn_ended.emit(prev, board.players[board.current_player])
+	
+	for x in range(board.SIZE.x):
+		for y in range(board.SIZE.y):
+			var tile_content = board.units[x][y]
+			if tile_content != null and tile_content is Troop:
+				tile_content.has_moved = false
+				tile_content.has_atkd = false
 
 	print("end turn clicked")
 	print(board.current_player)
@@ -83,6 +90,10 @@ func end_turn():
 ## WARNING: If the move is invalid, then this function will throw
 ## an error.
 func troop_move(troop: Troop, tile: Vector2i):
+	# checks if troop can move
+	var has_moved = troop.can_move(Vector2i(troop.pos.x, troop.pos.y), tile)
+	if has_moved:
+		return
 	# Moves the unit
 	self.board.units[troop.pos.x][troop.pos.y] = null
 	self.board.units[tile.x][tile.y] = troop

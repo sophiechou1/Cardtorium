@@ -211,3 +211,14 @@ func attack_unit(defender: Unit):
 	print("Attacker: {0} HP".format({0:health}))
 	print("Defender: {0} HP".format({0:defender.health}))
 	print()
+
+## does stuff for troop movement
+func can_move(from: Vector2i, to: Vector2i):
+	var tmp = has_moved
+	for attr in attributes:
+		var value = attr.on_moved(from, to)
+		if value != null:
+			# TODO do something with value
+			pass
+	has_moved = true
+	return tmp
