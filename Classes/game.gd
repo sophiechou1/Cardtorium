@@ -67,7 +67,7 @@ func end_turn():
 		board.current_player = 0
 		board.turns += 1
 	# Sets next player up to begin their turn
-	render_topbar.emit(board.turns, board.current_player)
+	#render_topbar.emit(board.turns, board.current_player)
 	board.players[board.current_player].begin_turn()
 	
 	# Lets other nodes know that a player has ended their turn

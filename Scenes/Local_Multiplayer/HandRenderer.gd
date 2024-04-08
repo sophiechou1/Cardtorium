@@ -2,6 +2,9 @@ extends Control
 
 var card_scene = preload ("res://Scenes/Card_Renderer/Card.tscn")
 
+
+@onready var game: Game = $/root/LocalMultiplayer/Game
+
 var player: Player
 var XBOUND = [200, 952]
 var YPOS = 550
@@ -19,7 +22,8 @@ func connect_to_player(p: Player):
 
 ## Renders the cards in a player's hand.
 func render_cards(hand: Array[Card]):
-
+	game.render_topbar.emit(game.board.turns, game.board.players[game.board.current_player])
+	
 	for card_node in cards:
 		card_node.queue_free()
 	cards.clear()
