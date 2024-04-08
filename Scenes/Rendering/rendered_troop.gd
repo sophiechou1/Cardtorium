@@ -10,6 +10,8 @@ func prepare_for_render(troop_to_render: Troop, game: Game):
 	var texture: Texture2D = load("res://Assets/Troop Sprites/idle_{0}.png".format({0: troop.id}))
 	if texture != null:
 		sprite.texture = texture
+	if troop.owned_by == 0:
+			sprite.flip_h = true
 	game.troop_moved.connect(self.on_troop_moved)
 	game.unit_removed.connect(self.on_troop_died)
 
