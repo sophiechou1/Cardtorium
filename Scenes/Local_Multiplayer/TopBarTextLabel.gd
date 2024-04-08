@@ -1,6 +1,5 @@
 extends RichTextLabel
 
-#signal game_ready()
 @onready var game: Game = $/root/LocalMultiplayer/Game
 
 func _ready():
