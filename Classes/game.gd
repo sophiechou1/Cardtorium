@@ -77,11 +77,19 @@ func end_turn():
 		board.current_player = 0
 		board.turns += 1
 	# Sets next player up to begin their turn
+	#render_topbar.emit(board.turns, board.current_player)
 	board.players[board.current_player].begin_turn()
 	render_topbar.emit(board.turns, board.players[board.current_player])
 	
 	# Lets other nodes know that a player has ended their turn
 	turn_ended.emit(prev, board.players[board.current_player])
+	
+	for x in range(board.SIZE.x):
+		for y in range(board.SIZE.y):
+			var tile_content = board.units[x][y]
+			if tile_content != null and tile_content is Troop:
+				tile_content.has_moved = false
+				tile_content.has_atkd = false
 
 	print("end turn clicked")
 	print(board.current_player)
@@ -124,6 +132,10 @@ func claim_territory(pos: Vector2i, radius: int, player: int = -2):
 ## WARNING: If the move is invalid, then this function will throw
 ## an error.
 func troop_move(troop: Troop, tile: Vector2i):
+	# checks if troop can move
+	var has_moved = troop.can_move(Vector2i(troop.pos.x, troop.pos.y), tile)
+	if has_moved:
+		return
 	# Moves the unit
 	self.board.units[troop.pos.x][troop.pos.y] = null
 	self.board.units[tile.x][tile.y] = troop
