@@ -54,10 +54,11 @@ func on_selected_tile(pos: Vector2i):
 			return
 		var troop = tile_content as Troop
 		if troop.has_moved or troop.just_placed:
-			return
-		troop.build_graph(selected_tile.x, selected_tile.y, game.board)
-		move_renderer.clear_move_outlines() # Clear previous move outlines
-		move_renderer.draw_move_outlines(troop.move_graph.keys(), selected_tile) # Draw move outlines
+			move_renderer.draw_current(troop.pos)
+		else:
+			troop.build_graph(selected_tile.x, selected_tile.y, game.board)
+			move_renderer.clear_move_outlines() # Clear previous move outlines
+			move_renderer.draw_move_outlines(troop.move_graph.keys(), selected_tile) # Draw move outlines
 		active_unit = troop
 	elif tile_content != null and tile_content is Troop:
 		# defender
@@ -72,7 +73,7 @@ func on_selected_tile(pos: Vector2i):
 		
 		if dist <= active_unit.rng:
 			move_renderer.clear_move_outlines() # Clear move outlines if not a troop
-			if active_unit is Troop and active_unit != troop: 
+			if active_unit is Troop and active_unit != troop:
 				active_unit.attack_unit(troop)
 				active_unit = null
 	elif active_unit != null:
@@ -88,7 +89,7 @@ func on_selected_tile(pos: Vector2i):
 		
 		# Clears the move outlines
 		move_renderer.clear_move_outlines()
-		if active_unit is Troop: 
+		if active_unit is Troop:
 			game.troop_move(active_unit, selected_tile)
 		deselect_unit()
 
@@ -96,7 +97,6 @@ func deselect_unit():
 	# Clears the move outlines
 	move_renderer.clear_move_outlines()
 	active_unit = null
-
 
 ## Must first select card to place on a tile
 func check_and_place_card():
@@ -128,10 +128,8 @@ func render_troop(troop: Troop, pos: Vector2i):
 	instance.position = Vector2(pos) * TILE_SIZE
 	add_child.call_deferred(instance)
 
-
 func render_city(city: City):
 	add_child.call_deferred(city)
-
 
 func claim_territory():
 	if active_unit == null:
