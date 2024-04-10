@@ -107,10 +107,17 @@ func claim_territory(pos: Vector2i, radius: int, player: int = -2):
 				continue
 			elif y >= board.SIZE.y:
 				break
+			var old = board.territory[x][y]
 			board.territory[x][y] = player
+			if old != -1:
+				board.players[old].territory -= 1
+				board.players[old].calculate_rpt()
+			board.players[player].territory += 1
 			claimed.append(Vector2i(x, y))
-	# Emits signal
+	# Emits signals
+	board.players[player].calculate_rpt()
 	territory_claimed.emit(claimed, player)
+	render_topbar.emit(board.turns, board.players[player])
 
 
 ## Moves a troop from one position to another.

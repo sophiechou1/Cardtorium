@@ -35,6 +35,8 @@ var rpt: int = 2
 var deck: Array[Card]
 ## The player's hand
 var hand: Array[Card]
+## How much territory the player has
+var territory: int
 
 ## Creates a new player resource from scratch
 func _init(board_size: Vector2i, _deck: Array[Card]):
@@ -126,3 +128,7 @@ func remove_from_hand(index: int):
 	var card: Card = self.hand.pop_at(index)
 	cards_removed.emit(old_hand, hand)
 	shuffle_card(card)
+
+## Calculates resources per turn
+func calculate_rpt():
+	rpt = 2 + (territory / 20)
