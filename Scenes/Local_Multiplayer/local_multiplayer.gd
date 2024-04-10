@@ -35,7 +35,7 @@ func _ready():
 	var camera = $Camera2D
 	camera.selected_tile.connect(self.on_selected_tile)
 	hand_renderer.card_selected.connect(self.on_card_selected)
-
+	game.turn_ended.connect(on_turn_ended)
 
 func on_card_selected(card_index: int):
 	selected_index = card_index
@@ -53,6 +53,8 @@ func on_selected_tile(pos: Vector2i):
 		if tile_content.owned_by != game.board.current_player:
 			return
 		var troop = tile_content as Troop
+		if troop.has_moved or troop.just_placed:
+			return
 		troop.build_graph(selected_tile.x, selected_tile.y, game.board)
 		move_renderer.clear_move_outlines() # Clear previous move outlines
 		move_renderer.draw_move_outlines(troop.move_graph.keys(), selected_tile) # Draw move outlines
@@ -116,6 +118,9 @@ func check_and_place_card():
 			# Deselect any selected tile
 			selected_tile = Vector2i()
 
+func on_turn_ended(prev_player: int, current_player: Player):
+	deselect_unit()
+	
 ## Renders a troop card by adding it to the scene tree
 func render_troop(troop: Troop, pos: Vector2i):
 	var instance = troop_scene.instantiate()
