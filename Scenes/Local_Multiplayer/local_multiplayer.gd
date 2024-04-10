@@ -11,7 +11,7 @@ signal card_placed(card_index: int)
 @onready var move_renderer = $MoveRender
 @onready var hand_renderer = $GUI_Renderer/HandRenderer
 #@onready var ter_renderer = $TerrainRenderer
-var active_unit = null
+var active_unit: Unit = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -30,6 +30,7 @@ func _ready():
 	for player in board.players:
 		hand_renderer.connect_to_player(player)
 	board.players[0].begin_turn()
+	game.render_topbar.emit(board.turns, board.players[board.current_player])
 
 	var camera = $Camera2D
 	camera.selected_tile.connect(self.on_selected_tile)
@@ -49,6 +50,8 @@ func on_selected_tile(pos: Vector2i):
 
 	var tile_content = game.board.units[selected_tile.x][selected_tile.y]
 	if tile_content != null and tile_content is Troop and active_unit == null:
+		if tile_content.owned_by != game.board.current_player:
+			return
 		var troop = tile_content as Troop
 		troop.build_graph(selected_tile.x, selected_tile.y, game.board)
 		move_renderer.clear_move_outlines() # Clear previous move outlines
@@ -57,6 +60,8 @@ func on_selected_tile(pos: Vector2i):
 	elif tile_content != null and tile_content is Troop:
 		# defender
 		var troop = tile_content as Troop
+		if troop.owned_by == game.board.current_player:
+			return
 		if troop == active_unit:
 			move_renderer.clear_move_outlines()
 			active_unit = null
@@ -83,7 +88,13 @@ func on_selected_tile(pos: Vector2i):
 		move_renderer.clear_move_outlines()
 		if active_unit is Troop: 
 			game.troop_move(active_unit, selected_tile)
-			active_unit = null
+		deselect_unit()
+
+func deselect_unit():
+	# Clears the move outlines
+	move_renderer.clear_move_outlines()
+	active_unit = null
+
 
 ## Must first select card to place on a tile
 func check_and_place_card():
@@ -92,6 +103,11 @@ func check_and_place_card():
 			var tile_content = game.board.units[selected_tile.x][selected_tile.y]
 			if tile_content != null and tile_content is Troop:
 				# Troop already exists on the selected tile, don't allow card placement
+				return
+			if not game.board.buildings[selected_tile.x][selected_tile.y] is City:
+				return
+			var current_player = game.board.current_player
+			if not game.board.territory[selected_tile.x][selected_tile.y] == current_player:
 				return
 			game.place_from_hand(selected_index, selected_tile.x, selected_tile.y)
 			selected_index = -1
@@ -106,3 +122,15 @@ func render_troop(troop: Troop, pos: Vector2i):
 	instance.prepare_for_render(troop, game)
 	instance.position = Vector2(pos) * TILE_SIZE
 	add_child.call_deferred(instance)
+
+
+func render_city(city: City):
+	add_child.call_deferred(city)
+
+
+func claim_territory():
+	if active_unit == null:
+		return
+	if active_unit.owned_by == game.board.territory[active_unit.pos.x][active_unit.pos.y]:
+		game.claim_territory(active_unit.pos, 1, active_unit.owned_by)
+	deselect_unit()

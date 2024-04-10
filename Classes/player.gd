@@ -35,16 +35,24 @@ var rpt: int = 2
 var deck: Array[Card]
 ## The player's hand
 var hand: Array[Card]
+## How much territory the player has
+var territory: int
 
 ## Creates a new player resource from scratch
-func _init(board_size: Vector2i, start_location: Vector2i, _deck: Array[Card]):
+func _init(board_size: Vector2i, _deck: Array[Card]):
 	randomize()
 	discovered = []
 	for x in range(board_size.x):
 		discovered.append([])
 		for y in range(board_size.y):
 			discovered[x].append(false)
-	base_position = Vector2i(start_location.x, start_location.y)
+	# Claims territory in a 1-tile radius
+	deck = _deck
+
+
+## Sets up player data
+func setup(game: Game, base_position: Vector2i, index: int):
+	var board_size = game.board.SIZE
 	# Clears the fog in a 2-tile radius around the home base
 	for x in range(base_position.x - 2, base_position.x + 3):
 		if x < 0:
@@ -57,7 +65,13 @@ func _init(board_size: Vector2i, start_location: Vector2i, _deck: Array[Card]):
 			elif y >= board_size.y:
 				break
 			discovered[x][y] = true
-	deck = _deck
+	# Sets local index
+	self.local_id = index
+	# Claims territory in a 1-tile radius
+	game.claim_territory(base_position, 1, index)
+	# Places home base
+	game.place_city(base_position)
+	cities = 1
 
 ## Called right before the player's turn begins
 func begin_turn():
@@ -114,3 +128,7 @@ func remove_from_hand(index: int):
 	var card: Card = self.hand.pop_at(index)
 	cards_removed.emit(old_hand, hand)
 	shuffle_card(card)
+
+## Calculates resources per turn
+func calculate_rpt():
+	rpt = 2 + (territory / 20)
