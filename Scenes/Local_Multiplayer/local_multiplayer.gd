@@ -30,6 +30,7 @@ func _ready():
 	for player in board.players:
 		hand_renderer.connect_to_player(player)
 	board.players[0].begin_turn()
+	game.render_topbar.emit(board.turns, board.players[board.current_player])
 
 	var camera = $Camera2D
 	camera.selected_tile.connect(self.on_selected_tile)

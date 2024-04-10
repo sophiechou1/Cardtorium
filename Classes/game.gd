@@ -40,7 +40,6 @@ func _ready():
 	board.players[0].setup(self, Vector2i(0,board.SIZE.y / 2), 0)
 	board.players[1].setup(self,Vector2i(board.SIZE.x - 1,board.SIZE.y / 2), 1)
 	num_players = 2
-	render_topbar.emit(board.turns, board.players[board.current_player])
 
 ## Changes the terrain for an array of tiles
 func set_terrain(terrain: Board.Terrain, location: Array[Vector2i]):
@@ -63,7 +62,10 @@ func place_card(card: Card, x: int, y: int):
 func place_from_hand(index: int, x: int, y: int):
 	var player: Player = board.players[board.current_player]
 	var card: Card = player.hand[index]
+	if player.resources < card.cost:
+		return
 	player.remove_from_hand(index)
+	render_topbar.emit(board.turns, board.players[board.current_player])
 	self.place_card(card, x, y)
 
 ## Goes to the next player's turn
@@ -75,8 +77,8 @@ func end_turn():
 		board.current_player = 0
 		board.turns += 1
 	# Sets next player up to begin their turn
-	render_topbar.emit(board.turns, board.players[board.current_player])
 	board.players[board.current_player].begin_turn()
+	render_topbar.emit(board.turns, board.players[board.current_player])
 	
 	# Lets other nodes know that a player has ended their turn
 	turn_ended.emit(prev, board.players[board.current_player])
