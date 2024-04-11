@@ -17,7 +17,8 @@ var attributes: Array[TroopAttribute] = []
 var defense: int
 ## Movement of the card
 var movement: int
-
+## Whether or not the troop has just been placed
+var just_placed = false
 
 ## Initiallizes a troop object from a card.
 func _init(_game: Game, card: Card=null):

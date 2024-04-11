@@ -10,6 +10,8 @@ var bus_index: int = 0
 func _ready():
     h_slider.value_changed.connect(on_value_changed)
     get_bus_name_by_index()
+    if bus_index == - 1:
+        return
     set_name_label_text()
     set_slider_value()
 
