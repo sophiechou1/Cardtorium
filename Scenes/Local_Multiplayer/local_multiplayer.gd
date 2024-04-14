@@ -53,7 +53,7 @@ func on_selected_tile(pos: Vector2i):
 		if tile_content.owned_by != game.board.current_player:
 			return
 		var troop = tile_content as Troop
-		if troop.has_moved or troop.just_placed:
+		if !troop.can_move:
 			move_renderer.draw_current(troop.pos)
 		else:
 			troop.build_graph(selected_tile.x, selected_tile.y, game.board)
