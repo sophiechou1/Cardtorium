@@ -41,6 +41,8 @@ func on_card_selected(card_index: int):
 	selected_index = card_index
 		
 func on_selected_tile(pos: Vector2i):
+	if (pos.x < 0 or pos.y < 0 or pos.x >= game.board.SIZE.x or pos.y >= game.board.SIZE.y):
+		return
 	selected_tile = pos
 	check_and_place_card()
 
