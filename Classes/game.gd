@@ -92,9 +92,6 @@ func end_turn():
 				tile_content.has_moved = false
 				tile_content.has_atkd = false
 				tile_content.just_placed = false
-	print("end turn clicked")
-	print(board.current_player)
-	print(board.turns)
 
 ## Claims territory in a radius for a player.
 ## Passing a -1 for the player parameter will unclaim territory.

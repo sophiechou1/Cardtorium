@@ -53,6 +53,10 @@ func on_selected_tile(pos: Vector2i):
 		if tile_content.owned_by != game.board.current_player:
 			return
 		var troop = tile_content as Troop
+		print_rich("[b]Name[/b]    : %s" % [troop.base_stats.name])
+		print_rich("[b]Health[/b]  : %d / %d" % [troop.health, troop.base_stats.health])
+		print_rich("[b]Attack[/b]  : %d" % [troop.attack])
+		print_rich("[b]Defense[/b] : %d\n" % [troop.defense])
 		if troop.has_moved or troop.just_placed:
 			move_renderer.draw_current(troop.pos)
 		else:

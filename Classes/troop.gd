@@ -207,22 +207,12 @@ func being_attacked(attacker: Unit, atk: int, attack_force: float) -> int:
 func attack_unit(defender: Unit):
 	if has_atkd:
 		return
-	# DEBUG: Remove later
-	print('Before:')
-	print("Attacker: {0} HP".format({0:health}))
-	print("Defender: {0} HP".format({0:defender.health}))
-	print()
 	var atk_force  = attack * float(self.health)/float(base_stats.health)
 	health -= defender.being_attacked(self, attack, atk_force)
 	# If the troop is dead, then it dies
 	if health <= 0:
 		health = 0
 		game.remove_unit(self)
-	# DEBUG: Remove later
-	print('After:')
-	print("Attacker: {0} HP".format({0:health}))
-	print("Defender: {0} HP".format({0:defender.health}))
-	print()
 
 ## does stuff for troop movement
 func can_move(from: Vector2i, to: Vector2i):
