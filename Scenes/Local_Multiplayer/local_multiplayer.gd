@@ -41,6 +41,8 @@ func on_card_selected(card_index: int):
 	selected_index = card_index
 		
 func on_selected_tile(pos: Vector2i):
+	if (pos.x < 0 or pos.y < 0 or pos.x >= game.board.SIZE.x or pos.y >= game.board.SIZE.y):
+		return
 	selected_tile = pos
 	check_and_place_card()
 
@@ -53,7 +55,11 @@ func on_selected_tile(pos: Vector2i):
 		if tile_content.owned_by != game.board.current_player:
 			return
 		var troop = tile_content as Troop
-		if !troop.can_move:
+		print_rich("[b]Name[/b]    : %s" % [troop.base_stats.name])
+		print_rich("[b]Health[/b]  : %d / %d" % [troop.health, troop.base_stats.health])
+		print_rich("[b]Attack[/b]  : %d" % [troop.attack])
+		print_rich("[b]Defense[/b] : %d\n" % [troop.defense])
+		if not troop.can_move:
 			move_renderer.draw_current(troop.pos)
 		else:
 			troop.build_graph(selected_tile.x, selected_tile.y, game.board)

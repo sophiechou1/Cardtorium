@@ -92,5 +92,5 @@ func setup_card(rendered, pos, scale, size):
 	rendered.scale.y = scale
 
 func switch_hands(prev: int, curr: Player):
-	print(curr.hand)
+	# print(curr.hand)
 	self.render_cards(curr.hand)

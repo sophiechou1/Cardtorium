@@ -10,6 +10,7 @@ var dragging = false
 var drag_threshold = 30 # must drag this many pixels to be considered a drag
 signal selected_tile(Vector2)
 var card_placement_allowed = false
+var zoom_speed = 0.1
 
 func _input(event):
 	if event is InputEventMouseButton:
@@ -22,7 +23,10 @@ func _input(event):
 				dragging = false
 			else:
 				handle_click()
-
+		elif event.is_pressed() and event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			zoom -= Vector2.ONE * zoom_speed
+		elif event.is_pressed() and event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			zoom += Vector2.ONE * zoom_speed
 	elif event is InputEventMouseMotion and mouse_button_down:
 		if initial_mouse_pos.distance_to(get_global_mouse_position()) > drag_threshold:
 			dragging = true
@@ -30,7 +34,13 @@ func _input(event):
 			var drag_distance = initial_mouse_pos - drag_end_world_pos
 			position += drag_distance
 			initial_mouse_pos = drag_end_world_pos
-
+	elif event is InputEventKey:
+		if event.is_pressed():
+			var keycode = DisplayServer.keyboard_get_keycode_from_physical(event.physical_keycode)
+			if keycode == KEY_MINUS:
+				zoom -= Vector2.ONE * zoom_speed
+			elif keycode == KEY_EQUAL:
+				zoom += Vector2.ONE * zoom_speed
 func _unhandled_key_input(event):
 	# Checks for up-down motion
 	if event.is_action_pressed("camera_up"):
