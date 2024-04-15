@@ -59,7 +59,7 @@ func on_selected_tile(pos: Vector2i):
 		print_rich("[b]Health[/b]  : %d / %d" % [troop.health, troop.base_stats.health])
 		print_rich("[b]Attack[/b]  : %d" % [troop.attack])
 		print_rich("[b]Defense[/b] : %d\n" % [troop.defense])
-		if troop.has_moved or troop.just_placed:
+		if not troop.can_move:
 			move_renderer.draw_current(troop.pos)
 		else:
 			troop.build_graph(selected_tile.x, selected_tile.y, game.board)
