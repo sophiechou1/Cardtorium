@@ -16,7 +16,7 @@ signal terrain_updated(changed: Array[Vector2i], terrain: Board.Terrain)
 ## Emitted when a troop is placed.
 signal troop_placed(troop: Troop, pos: Vector2i)
 ## Emitted when a player ends their turn.
-signal turn_ended(local_id: int)
+signal turn_ended(local_id: int, current_player: Player)
 ## Emitted when a troop is moved
 signal troop_moved(troop: Troop, path: Array)
 ## Emitted when a unit is removed from the board.
@@ -57,7 +57,6 @@ func place_card(card: Card, x: int, y: int):
 			board.units[x][y] = troop
 			troop.pos = Vector2i(x, y)
 			troop_placed.emit(troop, Vector2i(x, y))
-			troop.just_placed = true
 
 ## Places the nth card in the player's hand onto the board at position x, y
 func place_from_hand(index: int, x: int, y: int):
@@ -85,13 +84,9 @@ func end_turn():
 	# Lets other nodes know that a player has ended their turn
 	turn_ended.emit(prev, board.players[board.current_player])
 	
-	for x in range(board.SIZE.x):
-		for y in range(board.SIZE.y):
-			var tile_content = board.units[x][y]
-			if tile_content != null and tile_content is Troop:
-				tile_content.has_moved = false
-				tile_content.has_atkd = false
-				tile_content.just_placed = false
+	print("end turn clicked")
+	print(board.current_player)
+	print(board.turns)
 
 ## Claims territory in a radius for a player.
 ## Passing a -1 for the player parameter will unclaim territory.
@@ -127,19 +122,15 @@ func claim_territory(pos: Vector2i, radius: int, player: int = -2):
 ## WARNING: If the move is invalid, then this function will throw
 ## an error.
 func troop_move(troop: Troop, tile: Vector2i):
-	# Do not allow move when troop just placed on city
-	if troop.just_placed:
-		return
-	# checks if troop can move
-	var has_moved = troop.can_move(Vector2i(troop.pos.x, troop.pos.y), tile)
-	if has_moved:
+	# Checks if troop can move
+	if not troop.can_move:
 		return
 	# Moves the unit
 	self.board.units[troop.pos.x][troop.pos.y] = null
 	self.board.units[tile.x][tile.y] = troop
 	# Sets the troop's position and stores its old position
 	var from = Vector2i(troop.pos.x, troop.pos.y)
-	troop.pos = tile
+	troop.move(tile)
 	# Emits the move signal
 	var path: Array = troop.move_graph[tile]
 	troop.clear_fog()

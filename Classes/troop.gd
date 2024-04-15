@@ -6,9 +6,9 @@ class_name Troop
 ## The troop id
 var id: int = 0
 ## Whether or not the troop has moved
-var has_moved: bool = false
+var can_move: bool = false
 ## Whether or not the troop has attacked
-var has_atkd: bool = false
+var can_attack: bool = false
 ## Graph of tiles that the troop can move to.
 var move_graph = null
 ## Stores the troop's attributes
@@ -17,8 +17,6 @@ var attributes: Array[TroopAttribute] = []
 var defense: int
 ## Movement of the card
 var movement: int
-## Whether or not the troop has just been placed
-var just_placed = false
 
 ## Initiallizes a troop object from a card.
 func _init(_game: Game, card: Card=null):
@@ -30,6 +28,7 @@ func _init(_game: Game, card: Card=null):
 	movement = base_stats.movement
 	rng = base_stats.attack_range
 	health = base_stats.health
+	game.turn_ended.connect(reset)
 	# Loads attributes
 	for attribute_id in self.base_stats.attributes:
 		# var attribute: TroopAttribute = load('res://Attributes/Troops/Logic/attribute_{0}.gd'.format({0:attribute_id})).new()
@@ -205,7 +204,7 @@ func being_attacked(attacker: Unit, atk: int, attack_force: float) -> int:
 
 ## Attacks another unit
 func attack_unit(defender: Unit):
-	if has_atkd:
+	if not can_attack:
 		return
 	var atk_force  = attack * float(self.health)/float(base_stats.health)
 	health -= defender.being_attacked(self, attack, atk_force)
@@ -214,13 +213,20 @@ func attack_unit(defender: Unit):
 		health = 0
 		game.remove_unit(self)
 
-## does stuff for troop movement
-func can_move(from: Vector2i, to: Vector2i):
-	var tmp = has_moved
+## Moves a troop from one position to another
+func move(destination: Vector2i):
+	if not can_move:
+		return
+	# Moves the unit
+	var from: Vector2i = Vector2i(pos.x, pos.y)
+	pos = destination
+	can_move = false
+	# Runs attributes
 	for attr in attributes:
-		var value = attr.on_moved(from, to)
-		if value != null:
-			# TODO do something with value
-			pass
-	has_moved = true
-	return tmp
+		attr.on_moved(self, from, destination)
+
+
+## Resets a troop at the end of a turn
+func reset(prev: int, player: Player):
+	can_move = true
+	can_attack = true

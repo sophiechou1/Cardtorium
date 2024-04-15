@@ -35,7 +35,7 @@ FACTION BORDER COLORS:
 @onready var range = $MarginContainer2/VBoxContainer/MarginContainer2/Stat_Container/RANGE_Container/Range
 @onready var move = $MarginContainer2/VBoxContainer/MarginContainer2/Stat_Container/MOVE_Container/Move
 @onready var card_name = $MarginContainer2/VBoxContainer/Name
-
+@onready var cost = $MarginContainer2/VBoxContainer/MarginContainer2/Stat_Container/COST_Container/CostArea/Cost
 # MAX 30 WORD DESCRIPTIONS
 
 func setup(_card: Card, _card_index: int):
@@ -47,6 +47,7 @@ func setup(_card: Card, _card_index: int):
 	range.text = str(card.attack_range)
 	move.text = str(card.movement)
 	card_name.text = card.name
+	cost.text = str(card.cost)
 
 ## Mouse hover on card
 func _on_focus_mouse_entered():

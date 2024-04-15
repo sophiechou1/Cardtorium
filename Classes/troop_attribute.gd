@@ -14,7 +14,7 @@ func add_description(desc: Attribute):
 
 
 # Virtual function which can be overwritten by children
-func on_moved(from: Vector2i, to: Vector2i):
+func on_moved(troop: Troop, from: Vector2i, to: Vector2i):
     pass
 
 
