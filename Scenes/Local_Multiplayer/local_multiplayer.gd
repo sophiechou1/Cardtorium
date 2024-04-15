@@ -63,11 +63,11 @@ func on_selected_tile(pos: Vector2i):
 	elif tile_content != null and tile_content is Troop:
 		# defender
 		var troop = tile_content as Troop
-		if troop.owned_by == game.board.current_player:
-			return
 		if troop == active_unit:
 			move_renderer.clear_move_outlines()
 			active_unit = null
+			return
+		if troop.owned_by == game.board.current_player:
 			return
 		var dist = floor(Vector2(active_unit.pos).distance_to(Vector2(troop.pos)))
 		
