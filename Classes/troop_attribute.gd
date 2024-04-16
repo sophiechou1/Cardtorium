@@ -6,7 +6,17 @@ class_name TroopAttribute
 
 ## Stores data on the attribute description
 var attribute: Attribute
+## Troop object which the attribute is attached to
+var parent: Troop
+## The game state
+var board: Board
 
+## Attaches the troop attribute to a game object and a troop object.
+## Also sets up the attribute's description.
+func setup(attribute_id: int, game: Game, troop: Troop):
+    attribute = load("res://Attributes/Troops/Data/attribute_{0}.tres".format({0: attribute_id}))
+    parent = troop
+    board = game.board
 
 ## Uses a .tscn file to add a description, name, abbreviation, and id to the attribute
 func add_description(desc: Attribute):

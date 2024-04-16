@@ -31,11 +31,12 @@ func _init(_game: Game, card: Card=null):
 	game.turn_ended.connect(reset)
 	# Loads attributes
 	for attribute_id in self.base_stats.attributes:
-		# var attribute: TroopAttribute = load('res://Attributes/Troops/Logic/attribute_{0}.gd'.format({0:attribute_id})).new()
-		# var desc: Attribute = load('res://Attributes/Troops/Data/attribute_{0}.tres'.format({0:attribute_id}))
-		# attribute.add_description(desc)
-		# attributes.append(attribute)
-		pass
+		var attribute_file = load('res://Attributes/Troops/Logic/attribute_{0}.gd'.format({0:attribute_id}))
+		if attribute_file == null:
+			continue
+		var attribute: TroopAttribute = attribute_file.new()
+		attribute.setup(attribute_id, game, self)
+		attributes.append(attribute)
 
 
 ## Clears fog in a radius around the card
