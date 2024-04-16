@@ -62,9 +62,10 @@ func on_selected_tile(pos: Vector2i):
 		if not troop.can_move:
 			move_renderer.draw_current(troop.pos)
 		else:
-			troop.build_graph(selected_tile.x, selected_tile.y, game.board)
+			troop.build_graph(selected_tile.x, selected_tile.y)
 			move_renderer.clear_move_outlines() # Clear previous move outlines
 			move_renderer.draw_move_outlines(troop.move_graph.keys(), selected_tile) # Draw move outlines
+		troop.build_action_list()
 		active_unit = troop
 	elif tile_content != null and tile_content is Troop:
 		# defender
@@ -96,7 +97,7 @@ func on_selected_tile(pos: Vector2i):
 		# Clears the move outlines
 		move_renderer.clear_move_outlines()
 		if active_unit is Troop:
-			game.troop_move(active_unit, selected_tile)
+			active_unit.move(selected_tile)
 		deselect_unit()
 
 func deselect_unit():
@@ -141,5 +142,6 @@ func claim_territory():
 	if active_unit == null:
 		return
 	if active_unit.owned_by == game.board.territory[active_unit.pos.x][active_unit.pos.y]:
-		game.claim_territory(active_unit.pos, 1, active_unit.owned_by)
+		active_unit.act(0)
+		# game.claim_territory(active_unit.pos, 1, active_unit.owned_by)
 	deselect_unit()

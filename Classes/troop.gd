@@ -5,10 +5,12 @@ class_name Troop
 
 ## The troop id
 var id: int = 0
-## Whether or not the troop has moved
+## Whether or not the troop can move
 var can_move: bool = false
-## Whether or not the troop has attacked
+## Whether or not the troop can attack
 var can_attack: bool = false
+## Whether or not the troop can act
+var can_act: bool = false
 ## Graph of tiles that the troop can move to.
 var move_graph = null
 ## Stores the troop's attributes
@@ -17,6 +19,8 @@ var attributes: Array[TroopAttribute] = []
 var defense: int
 ## Movement of the card
 var movement: int
+## All possible actions that the troop can take
+var actions: Array[Action]
 
 ## Initiallizes a troop object from a card.
 func _init(_game: Game, card: Card=null):
@@ -37,7 +41,6 @@ func _init(_game: Game, card: Card=null):
 		var attribute: TroopAttribute = attribute_file.new()
 		attribute.setup(attribute_id, game, self)
 		attributes.append(attribute)
-
 
 ## Clears fog in a radius around the card
 func clear_fog():
@@ -73,9 +76,8 @@ func _get_surrounding(center: Vector2i, radius: int) -> Array[Vector2i]:
 			output.append(center + Vector2i(x_off, y_off))
 	return output
 
-
 ## Builds a graph of the tiles that the unit can move to.
-func build_graph(x: int, y: int, board: Board):
+func build_graph(x: int, y: int):
 	var graph: Dictionary = {}
 	var visited: Dictionary = {}
 	var start = Vector2i(x, y)
@@ -85,7 +87,7 @@ func build_graph(x: int, y: int, board: Board):
 	var frontier_data: Dictionary = {}
 	var strength: float = float(self.base_stats.movement)
 	for surround in _get_surrounding(start, 1):
-		var new_strength = self._calc_move_cost(strength, start, surround, board)
+		var new_strength = self._calc_move_cost(strength, start, surround)
 		if new_strength < 0:
 			continue
 		# Deep copies surround for the path
@@ -106,7 +108,7 @@ func build_graph(x: int, y: int, board: Board):
 			continue
 		# Search surrounding tiles
 		for surround in _get_surrounding(tile, 1):
-			var new_strength = self._calc_move_cost(strength, tile, surround, board)
+			var new_strength = self._calc_move_cost(strength, tile, surround)
 			if new_strength < 0:
 				continue
 			var to = Vector2i(surround.x, surround.y)
@@ -129,7 +131,6 @@ func build_graph(x: int, y: int, board: Board):
 			frontier_data[to] = [new_strength, new_dist, new_path]
 	self.move_graph = graph
 
-
 ## Internal function which determines the cost of moving from a tile to a tile.[br][br]
 ##
 ## This is used in [method build_graph] to determine where a unit can move to. Attributes which
@@ -140,12 +141,12 @@ func build_graph(x: int, y: int, board: Board):
 ## [param strength]: An approximation to how many tiles this unit can move[br]
 ## [param from]: Tile that the unit is moving from[br]
 ## [param to]: Tile that the unit is moving to. Should be 1 tile away from [param from][br]
-## [param board]: The state of the board. See [member Game.board][br]
 ## [b]Returns: [float][/b][br]
 ## A number which represents approximately how much farther a unit can move. A return
 ## of 0 indicates that the unit can no longer move after going to [param to]. A return of
 ## -1 indicates that the unit cannot move to [param to]. Non-integer returns are allowed.
-func _calc_move_cost(strength: float, from: Vector2i, to: Vector2i, board: Board) -> float:
+func _calc_move_cost(strength: float, from: Vector2i, to: Vector2i) -> float:
+	var board = game.board
 	# Checks if destination is even on the board
 	if to.x < 0 or to.y < 0 or to.x >= board.SIZE.x or to.y >= board.SIZE.y:
 		return -1
@@ -185,7 +186,6 @@ func _calc_move_cost(strength: float, from: Vector2i, to: Vector2i, board: Board
 	# TODO: Check if there is an enemy nearby to apply zone-of-control
 	return max(strength - 1, 0)
 
-
 ## Called when the unit is attacked
 func being_attacked(attacker: Unit, atk: int, attack_force: float) -> int:
 	# Calculates your defense force
@@ -198,10 +198,12 @@ func being_attacked(attacker: Unit, atk: int, attack_force: float) -> int:
 		health = 0
 		game.remove_unit(self)
 		return 0
+	# Runs through attributes
+	for attr in attributes:
+		attr.on_attacked(attacker)
 	# Calculates counter damage
 	var counter_damage: int = floor((def_force/(attack_force+def_force))*defense)
 	return counter_damage
-
 
 ## Attacks another unit
 func attack_unit(defender: Unit):
@@ -209,25 +211,75 @@ func attack_unit(defender: Unit):
 		return
 	var atk_force  = attack * float(self.health)/float(base_stats.health)
 	health -= defender.being_attacked(self, attack, atk_force)
+	# Prevents the unit from doing other actions
+	can_act = false
+	can_attack = false
+	can_move = false
 	# If the troop is dead, then it dies
 	if health <= 0:
 		health = 0
 		game.remove_unit(self)
+	# Runs through attributes if it survives
+	for attr in attributes:
+		attr.on_attack(defender)
 
 ## Moves a troop from one position to another
 func move(destination: Vector2i):
-	if not can_move:
+	if not can_move or game.board.units[destination.x][destination.y] != null:
 		return
 	# Moves the unit
 	var from: Vector2i = Vector2i(pos.x, pos.y)
+	game.board.units[from.x][from.y] = null
+	game.board.units[destination.x][destination.y] = self
 	pos = destination
+	# Prevents unit from doing other actions
+	can_act = false
+	can_attack = false
 	can_move = false
 	# Runs attributes
 	for attr in attributes:
-		attr.on_moved(self, from, destination)
-
+		attr.on_moved(from, destination)
+	# Emits the move signal
+	var path: Array = move_graph[destination]
+	clear_fog()
+	game.troop_moved.emit(self, path)
 
 ## Resets a troop at the end of a turn
 func reset(prev: int, player: Player):
 	can_move = true
 	can_attack = true
+	can_act = true
+	for attr in attributes:
+		attr.reset()
+
+## Builds the troop's action list
+func build_action_list():
+	actions = []
+	# Checks if the troop is able to claim territory
+	# If so, builds the claim action
+	if game.board.territory[pos.x][pos.y] == owned_by:
+		var claim = Action.new()
+		claim.setup(claim_territory)
+		claim.name = "Claim Territory"
+		claim.description = "Claims territory in a 1-tile radius"
+		actions.append(claim)
+	# Adds attribute actions
+	for attr in attributes:
+		var action = attr.build_action()
+		if action != null:
+			actions.append(action)
+
+## Claims territory in a 1-tile radius for the troop
+func claim_territory():
+	game.claim_territory(pos, 1, owned_by)
+
+## Runs a certain action
+func act(index: int):
+	if index >= len(actions):
+		return
+	elif not can_act:
+		return
+	can_move = false
+	can_attack = false
+	can_act = false
+	actions[index].execute()
