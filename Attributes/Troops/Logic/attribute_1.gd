@@ -1,3 +1,7 @@
 extends TroopAttribute
 
-# Logic for dash attribute can go here
+# Logic for retreat attribute can go here
+
+
+func on_attack(defender: Unit):
+    parent.can_move = true

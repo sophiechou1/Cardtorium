@@ -18,15 +18,15 @@ func setup(attribute_id: int, game: Game, troop: Troop):
     parent = troop
     board = game.board
 
-## Uses a .tscn file to add a description, name, abbreviation, and id to the attribute
-func add_description(desc: Attribute):
-    attribute = desc
-
-
 # Virtual function which can be overwritten by children
-func on_moved(troop: Troop, from: Vector2i, to: Vector2i):
+func on_moved(from: Vector2i, to: Vector2i):
     pass
 
+func on_attack(defender: Unit):
+    pass
+
+func on_attacked(attacker: Troop):
+    pass
 
 ## Virtual function which overrides movement costs.
 ## Overrides to this function can return a non-null value to change the move calculation.
@@ -35,9 +35,16 @@ func on_moved(troop: Troop, from: Vector2i, to: Vector2i):
 func calc_move_cost(strength: float, from: Vector2i, to: Vector2i, board: Board):
     return null
 
-
 ## Virtual function which overrides fog clearing.
 ## Overrides to this function can return a non-null value to change the fog clearing.
 ## Otherwise, returning null uses the default.
 func clear_fog(pos: Vector2i):
     return null
+
+## Virtual function which allows an attribute to add actions to a troop
+func build_action() -> Action:
+    return null
+
+## Allows attributes with state to reset at the end of a turn
+func reset():
+    pass
