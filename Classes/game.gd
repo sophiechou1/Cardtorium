@@ -27,13 +27,15 @@ signal render_topbar(turn: int, player: Player)
 signal city_placed(city: City)
 ## Emitted when a player claims territory
 signal territory_claimed(claimed: Array[Vector2i], player_index: int)
+## Emitted when a troop toggles between having actions it can take, and not
+signal troop_toggle_act(troop: Troop)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	board = Board.new()
 	# Creates a new board of size 11 x 11
-	var width = 11
-	var height = 11
+	var width = 5
+	var height = 5
 	board.setup(width, height, 2)
 	# for i in range(len(board.players)):
 	# 	board.players[i].setup()
@@ -117,24 +119,6 @@ func claim_territory(pos: Vector2i, radius: int, player: int = -2):
 	board.players[player].calculate_rpt()
 	territory_claimed.emit(claimed, player)
 	render_topbar.emit(board.turns, board.players[player])
-
-## Moves a troop from one position to another.
-## WARNING: If the move is invalid, then this function will throw
-## an error.
-func troop_move(troop: Troop, tile: Vector2i):
-	# Checks if troop can move
-	if not troop.can_move:
-		return
-	# Moves the unit
-	self.board.units[troop.pos.x][troop.pos.y] = null
-	self.board.units[tile.x][tile.y] = troop
-	# Sets the troop's position and stores its old position
-	var from = Vector2i(troop.pos.x, troop.pos.y)
-	troop.move(tile)
-	# Emits the move signal
-	var path: Array = troop.move_graph[tile]
-	troop.clear_fog()
-	troop_moved.emit(troop, path)
 
 ## Removes a unit from the board
 func remove_unit(unit: Unit):

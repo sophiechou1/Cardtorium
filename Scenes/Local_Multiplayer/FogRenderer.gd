@@ -27,10 +27,22 @@ func render_all(player: Player=null):
 	# Adds fog to world border
 	for x in range(board.SIZE.x):
 		fog.append(Vector2i(x, -1))
+		fog.append(Vector2i(x, -2))
 		fog.append(Vector2i(x, board.SIZE.y))
+		fog.append(Vector2i(x, board.SIZE.y+1))
 	for y in range( - 1, board.SIZE.y + 1):
 		fog.append(Vector2i( - 1, y))
 		fog.append(Vector2i(board.SIZE.x, y))
+		fog.append(Vector2i( - 2, y))
+		fog.append(Vector2i(board.SIZE.x+1, y))
+	fog.append(Vector2i(-1, -2))
+	fog.append(Vector2i(-2, -2))
+	fog.append(Vector2i(board.SIZE.x, -2))
+	fog.append(Vector2i(board.SIZE.x+1, -2))
+	fog.append(Vector2i(-1, board.SIZE.y+1))
+	fog.append(Vector2i(-2, board.SIZE.y+1))
+	fog.append(Vector2i(board.SIZE.x, board.SIZE.y+1))
+	fog.append(Vector2i(board.SIZE.x+1, board.SIZE.y+1))
 	
 	set_cells_terrain_connect(0, fog, 0, 0)
 	clear_fog(discovered)
