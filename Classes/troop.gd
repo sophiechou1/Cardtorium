@@ -297,7 +297,7 @@ func build_action_list():
 	if game.board.territory[pos.x][pos.y] == owned_by:
 		var claim = Action.new()
 		claim.setup(claim_territory)
-		claim.name = "Claim Territory"
+		claim.name = "Claim"
 		claim.description = "Claims territory in a 1-tile radius"
 		actions.append(claim)
 	# Adds attribute actions
