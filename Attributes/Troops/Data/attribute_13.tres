@@ -5,6 +5,6 @@
 [resource]
 script = ExtResource("1_5bqgq")
 name = "Rally"
-description = "Increase attack and defense of allies in range"
+description = "Increase attack and defense of allies by 1.5x in a 1-tile radius"
 id = 13
 abbreviation = "RALLY"

@@ -14,4 +14,4 @@ defense = 3
 attack_range = 1
 movement = 1
 cost = 7
-attributes = [13]
+attributes = Array[int]([13])

@@ -281,9 +281,16 @@ func clear():
 ## Resets a troop at the end of a turn
 func reset(prev: int, player: Player):
 	clear()
+	# Resets abilities
 	can_move = true
 	can_attack = true
 	can_act = true
+	# Sets all stats back to default
+	attack = base_stats.attack
+	defense = base_stats.defense
+	rng = base_stats.attack_range
+	movement = base_stats.movement
+	# Runs through attributes
 	for attr in attributes:
 		attr.reset()
 
