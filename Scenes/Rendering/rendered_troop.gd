@@ -2,7 +2,6 @@ extends Node2D
 
 var troop: Troop
 
-
 # Called when the node enters the scene tree for the first time.
 func prepare_for_render(troop_to_render: Troop, game: Game):
 	var sprite = $Sprite
@@ -17,7 +16,6 @@ func prepare_for_render(troop_to_render: Troop, game: Game):
 	game.unit_removed.connect(self.on_troop_died)
 	game.troop_toggle_act.connect(self.on_troop_toggle_act)
 	game.turn_ended.connect(self.on_turn_ended)
-	game.troop_placed.connect(self.on_troop_placed)
 
 ## Reset the sprite to normal modulate
 func on_turn_ended(_prev, _players):
@@ -33,11 +31,9 @@ func on_troop_toggle_act(_troop: Troop):
 func on_troop_moved(_troop: Troop, path: Array):
 	if _troop != self.troop:
 		return
-	position = 64 * path[-1]
-
+	position = 64 * path[- 1]
 
 ## Called when a troop dies
 func on_troop_died(unit: Unit):
 	if unit is Troop and unit == troop:
 		self.queue_free()
-
