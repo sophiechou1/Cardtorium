@@ -250,6 +250,8 @@ func attack_unit(defender: Unit):
 	# Runs through attributes if it survives
 	for attr in attributes:
 		attr.on_attack(defender)
+	if not can_act and not can_attack and not can_move:
+		game.troop_toggle_act.emit(self)
 
 ## Moves a troop from one position to another
 func move(destination: Vector2i):
@@ -264,13 +266,16 @@ func move(destination: Vector2i):
 	can_act = false
 	can_attack = false
 	can_move = false
-	# Runs attributes
-	for attr in attributes:
-		attr.on_moved(from, destination)
 	# Emits the move signal
 	var path: Array = move_graph[destination]
 	clear_fog()
 	game.troop_moved.emit(self, path)
+	# Runs attributes
+	for attr in attributes:
+		attr.on_moved(from, destination)
+	# Emits the done signal
+	if not can_act and not can_attack and not can_move:
+		game.troop_toggle_act.emit(self)
 
 ## Clears data which is generated on selection
 func clear():
@@ -293,6 +298,7 @@ func reset(prev: int, player: Player):
 	# Runs through attributes
 	for attr in attributes:
 		attr.reset()
+	game.troop_toggle_act(self)
 
 ## Builds the troop's action list
 func build_action_list():
@@ -327,4 +333,6 @@ func act(index: int):
 	can_attack = false
 	can_act = false
 	actions[index].execute()
+	if not can_act and not can_attack and not can_move:
+		game.troop_toggle_act.emit(self)
 

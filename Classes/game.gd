@@ -27,6 +27,8 @@ signal render_topbar(turn: int, player: Player)
 signal city_placed(city: City)
 ## Emitted when a player claims territory
 signal territory_claimed(claimed: Array[Vector2i], player_index: int)
+## Emitted when a troop toggles between having actions it can take, and not
+signal troop_toggle_act(troop: Troop)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
