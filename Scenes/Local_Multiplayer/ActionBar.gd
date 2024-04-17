@@ -22,7 +22,7 @@ func display_troop(troop: Troop) -> Array[Button]:
     var buttons: Array[Button] = []
     for action in actions:
         var scene = action_button_scene.instantiate()
-        scene.setup(action)
+        scene.setup(action, i)
         scene.name = "action_%d" % [i]
         hbox.add_child(scene)
         buttons.append(scene)

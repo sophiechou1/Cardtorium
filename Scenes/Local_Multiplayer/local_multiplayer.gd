@@ -96,7 +96,7 @@ func select_unit(unit: Unit):
 		# Displays actions it can take
 		var action_buttons: Array[Button] = action_bar.display_troop(unit)
 		for button in action_buttons:
-			pass
+			button.pressed_with.connect(troop_action)
 
 ## Deselects a unit
 func deselect_unit():
@@ -128,6 +128,7 @@ func check_and_place_card():
 			# Deselect any selected tile
 			selected_tile = Vector2i()
 
+## Called when a player presses the end_turn button
 func on_turn_ended(prev_player: int, current_player: Player):
 	deselect_unit()
 	
@@ -138,13 +139,14 @@ func render_troop(troop: Troop, pos: Vector2i):
 	instance.position = Vector2(pos) * TILE_SIZE
 	add_child.call_deferred(instance)
 
+## Renders a newly-placed city
 func render_city(city: City):
 	add_child.call_deferred(city)
 
-func claim_territory():
+## Runs an action for some troop
+func troop_action(index: int):
 	if active_unit == null:
 		return
 	if active_unit.owned_by == game.board.territory[active_unit.pos.x][active_unit.pos.y]:
-		active_unit.act(0)
-		# game.claim_territory(active_unit.pos, 1, active_unit.owned_by)
+		active_unit.act(index)
 	deselect_unit()
