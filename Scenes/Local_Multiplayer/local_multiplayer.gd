@@ -10,6 +10,7 @@ var selected_tile: Vector2i = Vector2i()
 signal card_placed(card_index: int)
 @onready var move_renderer = $MoveRender
 @onready var hand_renderer = $GUI_Renderer/HandRenderer
+@onready var action_bar = $GUI_Renderer/Control/ActionBar
 #@onready var ter_renderer = $TerrainRenderer
 var active_unit: Unit = null
 
@@ -59,14 +60,7 @@ func on_selected_tile(pos: Vector2i):
 		print_rich("[b]Health[/b]  : %d / %d" % [troop.health, troop.base_stats.health])
 		print_rich("[b]Attack[/b]  : %d" % [troop.attack])
 		print_rich("[b]Defense[/b] : %d\n" % [troop.defense])
-		# Builds the lists of a troop's potential actions
-		troop.build_graph()
-		troop.build_action_list()
-		troop.build_attack_list()
-		move_renderer.clear()
-		move_renderer.draw_move_outlines(troop.move_graph.keys()) # Draw move outlines
-		move_renderer.draw_attack_outlines(troop.attack_list.keys())
-		active_unit = troop
+		select_unit(troop)
 		return
 	# Don't need to do anything if no unit selected
 	elif active_unit == null:
@@ -86,9 +80,30 @@ func on_selected_tile(pos: Vector2i):
 	else:
 		deselect_unit()
 
+## Selects a unit
+func select_unit(unit: Unit):
+	if unit is Troop:
+		# Sets active unit
+		active_unit = unit
+		# Builds the lists of a troop's potential actions
+		unit.build_graph()
+		unit.build_action_list()
+		unit.build_attack_list()
+		# Renders the moves it can make
+		move_renderer.clear()
+		move_renderer.draw_move_outlines(unit.move_graph.keys()) # Draw move outlines
+		move_renderer.draw_attack_outlines(unit.attack_list.keys())
+		# Displays actions it can take
+		var action_buttons: Array[Button] = action_bar.display_troop(unit)
+		for button in action_buttons:
+			pass
+
+## Deselects a unit
 func deselect_unit():
 	if active_unit is Troop:
 		active_unit.clear()
+	# Clears action bar
+	action_bar.display_default()
 	# Clears the move outlines
 	move_renderer.clear()
 	active_unit = null
