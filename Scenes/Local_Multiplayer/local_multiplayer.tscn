@@ -416,6 +416,7 @@ metadata/_edit_horizontal_guides_ = [-128.0]
 script = ExtResource("1_cv5ps")
 
 [node name="Background" type="Sprite2D" parent="."]
+position = Vector2(-64, -64)
 texture = ExtResource("2_smxou")
 centered = false
 region_enabled = true
