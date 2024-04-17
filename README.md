@@ -3,7 +3,7 @@
   <h3>A turn-based 2D card civilization game</h3>
   <image style="display: block; margin-left: auto; margin-right: auto; width: 20%; border-radius: 10%;" src="Assets/UI/cardtorium_logo (2).png"/>
 
-  <a href="https://discord.gg/XmMPXyQF">Join the Discord</a>
+  <a href="https://discord.gg/NB8Jnkqh2h">Join the Discord</a>
 </div> 
 
 #### What is Cardtorium?
@@ -38,7 +38,7 @@ cd Cardtorium
 ```
 
 #### Get help and chat with us!
-- Join [our discord server](https://discord.gg/XmMPXyQF)
+- Join [our discord server](https://discord.gg/NB8Jnkqh2h)
 
 #### Documentation links
 - Godot: [Godot](https://docs.godotengine.org/en/stable/index.html)
