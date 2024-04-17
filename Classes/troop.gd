@@ -21,6 +21,8 @@ var defense: int
 var movement: int
 ## All possible actions that the troop can take
 var actions: Array[Action]
+## A list of all troops / buildings that this troop can attack
+var attack_list: Dictionary
 
 ## Initiallizes a troop object from a card.
 func _init(_game: Game, card: Card=null):
@@ -77,9 +79,14 @@ func _get_surrounding(center: Vector2i, radius: int) -> Array[Vector2i]:
 	return output
 
 ## Builds a graph of the tiles that the unit can move to.
-func build_graph(x: int, y: int):
+func build_graph():
 	var graph: Dictionary = {}
-	var visited: Dictionary = {}
+	if not can_move:
+		graph[pos] = [pos]
+		move_graph = graph
+		return
+	var x = pos.x
+	var y = pos.y
 	var start = Vector2i(x, y)
 	var frontier: Array = []
 	# Elements in the frontier_data take the form
@@ -186,6 +193,27 @@ func _calc_move_cost(strength: float, from: Vector2i, to: Vector2i) -> float:
 	# TODO: Check if there is an enemy nearby to apply zone-of-control
 	return max(strength - 1, 0)
 
+## Builds an array of tiles that the unit can attack
+func build_attack_list():
+	attack_list = {}
+	if not can_attack:
+		return
+	for x in range(pos.x - rng, pos.x + rng + 1):
+		if x < 0:
+			continue
+		elif x >= game.board.SIZE.x:
+			break
+		for y in range(pos.y - rng, pos.y + rng + 1):
+			if y < 0:
+				continue
+			elif y >= game.board.SIZE.y:
+				break
+			if game.board.units[x][y] != null:
+				var troop: Troop = game.board.units[x][y]
+				if troop.owned_by == owned_by:
+					continue
+				attack_list[Vector2i(x, y)] = troop
+
 ## Called when the unit is attacked
 func being_attacked(attacker: Unit, atk: int, attack_force: float) -> int:
 	# Calculates your defense force
@@ -244,8 +272,15 @@ func move(destination: Vector2i):
 	clear_fog()
 	game.troop_moved.emit(self, path)
 
+## Clears data which is generated on selection
+func clear():
+	move_graph = {}
+	attack_list = {}
+	actions = []
+
 ## Resets a troop at the end of a turn
 func reset(prev: int, player: Player):
+	clear()
 	can_move = true
 	can_attack = true
 	can_act = true
@@ -255,6 +290,8 @@ func reset(prev: int, player: Player):
 ## Builds the troop's action list
 func build_action_list():
 	actions = []
+	if not can_act:
+		return
 	# Checks if the troop is able to claim territory
 	# If so, builds the claim action
 	if game.board.territory[pos.x][pos.y] == owned_by:
@@ -283,3 +320,4 @@ func act(index: int):
 	can_attack = false
 	can_act = false
 	actions[index].execute()
+

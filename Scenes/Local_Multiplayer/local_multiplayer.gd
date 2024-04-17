@@ -41,16 +41,16 @@ func on_card_selected(card_index: int):
 	selected_index = card_index
 		
 func on_selected_tile(pos: Vector2i):
+	# Checks that the tile is in bounds
 	if (pos.x < 0 or pos.y < 0 or pos.x >= game.board.SIZE.x or pos.y >= game.board.SIZE.y):
 		return
 	selected_tile = pos
+	# Checks if the tile selection was for the purpose of placing a card
 	check_and_place_card()
 
-	# Tester code for topbar until we have actual things that change it
-	#game.board.players[game.board.current_player].resources -= 1
-	#game.render_topbar.emit(game.board.turns, game.board.players[game.board.current_player])
-
+	# Checks if the clicked tile contains any units
 	var tile_content = game.board.units[selected_tile.x][selected_tile.y]
+	# Sets a new active unit
 	if tile_content != null and tile_content is Troop and active_unit == null:
 		if tile_content.owned_by != game.board.current_player:
 			return
@@ -59,50 +59,38 @@ func on_selected_tile(pos: Vector2i):
 		print_rich("[b]Health[/b]  : %d / %d" % [troop.health, troop.base_stats.health])
 		print_rich("[b]Attack[/b]  : %d" % [troop.attack])
 		print_rich("[b]Defense[/b] : %d\n" % [troop.defense])
-		if not troop.can_move:
-			move_renderer.draw_current(troop.pos)
-		else:
-			troop.build_graph(selected_tile.x, selected_tile.y)
-			move_renderer.clear_move_outlines() # Clear previous move outlines
-			move_renderer.draw_move_outlines(troop.move_graph.keys(), selected_tile) # Draw move outlines
+		# Builds the lists of a troop's potential actions
+		troop.build_graph()
 		troop.build_action_list()
+		troop.build_attack_list()
+		move_renderer.clear()
+		move_renderer.draw_move_outlines(troop.move_graph.keys()) # Draw move outlines
+		move_renderer.draw_attack_outlines(troop.attack_list.keys())
 		active_unit = troop
-	elif tile_content != null and tile_content is Troop:
-		# defender
-		var troop = tile_content as Troop
-		if troop == active_unit:
-			move_renderer.clear_move_outlines()
-			active_unit = null
-			return
-		if troop.owned_by == game.board.current_player:
-			return
-		var dist = floor(Vector2(active_unit.pos).distance_to(Vector2(troop.pos)))
-		
-		if dist <= active_unit.rng:
-			move_renderer.clear_move_outlines() # Clear move outlines if not a troop
-			if active_unit is Troop and active_unit != troop:
-				active_unit.attack_unit(troop)
-				active_unit = null
-	elif active_unit != null:
-		# Checks if the move is valid
-		if active_unit.move_graph == null:
-			move_renderer.clear_move_outlines()
-			active_unit = null
-			return
-		elif selected_tile not in active_unit.move_graph:
-			move_renderer.clear_move_outlines()
-			active_unit = null
-			return
-		
-		# Clears the move outlines
-		move_renderer.clear_move_outlines()
-		if active_unit is Troop:
-			active_unit.move(selected_tile)
+		return
+	# Don't need to do anything if no unit selected
+	elif active_unit == null:
+		return
+	
+	# Checks for attacking
+	if active_unit is Troop and selected_tile in active_unit.attack_list:
+		# Checks for attacking a troop
+		if tile_content != null:
+			active_unit.attack_unit(tile_content)
+			deselect_unit()
+	# Checks for moving
+	elif active_unit is Troop and selected_tile in active_unit.move_graph:
+		active_unit.move(selected_tile)
+		deselect_unit()
+	# Deselect unit
+	else:
 		deselect_unit()
 
 func deselect_unit():
+	if active_unit is Troop:
+		active_unit.clear()
 	# Clears the move outlines
-	move_renderer.clear_move_outlines()
+	move_renderer.clear()
 	active_unit = null
 
 ## Must first select card to place on a tile
