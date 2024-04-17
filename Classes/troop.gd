@@ -298,7 +298,7 @@ func reset(prev: int, player: Player):
 	# Runs through attributes
 	for attr in attributes:
 		attr.reset()
-	game.troop_toggle_act(self)
+	# game.troop_toggle_act(self)
 
 ## Builds the troop's action list
 func build_action_list():

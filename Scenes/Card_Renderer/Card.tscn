@@ -178,9 +178,9 @@ vertical_alignment = 1
 [node name="MarginContainer" type="MarginContainer" parent="MarginContainer2/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/margin_left = 50
-theme_override_constants/margin_top = 10
+theme_override_constants/margin_top = 50
 theme_override_constants/margin_right = 50
-theme_override_constants/margin_bottom = 10
+theme_override_constants/margin_bottom = 50
 
 [node name="Image_Border" type="ColorRect" parent="MarginContainer2/VBoxContainer/MarginContainer"]
 custom_minimum_size = Vector2(50, 175)
@@ -189,13 +189,13 @@ color = Color(0.0588235, 0.0588235, 0.0588235, 1)
 
 [node name="MarginContainer" type="MarginContainer" parent="MarginContainer2/VBoxContainer/MarginContainer"]
 layout_mode = 2
-theme_override_constants/margin_left = 5
-theme_override_constants/margin_top = 5
-theme_override_constants/margin_right = 5
-theme_override_constants/margin_bottom = 5
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
 
 [node name="Card_Image" type="TextureRect" parent="MarginContainer2/VBoxContainer/MarginContainer/MarginContainer"]
-custom_minimum_size = Vector2(0, 300)
+custom_minimum_size = Vector2(0, 500)
 layout_mode = 2
 texture = ExtResource("7_6yorb")
 expand_mode = 2
@@ -215,7 +215,7 @@ custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 75
+theme_override_font_sizes/font_size = 50
 text = "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu magna ipsum. Nam tempus erat nisi, eu gravida diam aliquam sed. Aliquam varius neque ut leo ultricies, at semper nisi.\""
 horizontal_alignment = 1
 vertical_alignment = 1
