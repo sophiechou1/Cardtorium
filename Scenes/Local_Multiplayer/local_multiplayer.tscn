@@ -549,6 +549,7 @@ format = 2
 script = ExtResource("17_ls0ak")
 
 [connection signal="city_placed" from="Game" to="." method="render_city"]
+[connection signal="input_requested" from="Game" to="." method="_on_game_input_requested"]
 [connection signal="render_topbar" from="Game" to="GUI_Renderer/Control/TopBar/ColorRect/RichTextLabel" method="_on_game_render_topbar"]
 [connection signal="terrain_updated" from="Game" to="TerrainRenderer" method="render"]
 [connection signal="territory_claimed" from="Game" to="TerritoryRenderer" method="_on_game_territory_claimed"]

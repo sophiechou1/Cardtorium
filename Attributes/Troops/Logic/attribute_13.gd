@@ -8,19 +8,19 @@ func build_action() -> Action:
     var action: Action = Action.new()
     action.name = attribute.name
     action.description = attribute.description
-    action.setup(buff_nearby)
+    action.setup(parent.game, buff_nearby)
     return action
 
 func buff_nearby():
     for x in range(parent.pos.x - 1, parent.pos.x + 2):
         if x < 0:
             continue
-        elif x > board.SIZE.x:
+        elif x >= board.SIZE.x:
             break
         for y in range(parent.pos.y - 1, parent.pos.y + 2):
             if y < 0:
                 continue
-            elif y > board.SIZE.y:
+            elif y >= board.SIZE.y:
                 break
             if board.units[x][y] == null:
                 continue

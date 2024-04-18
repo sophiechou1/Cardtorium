@@ -10,3 +10,10 @@ func draw_move_outlines(possible_moves: Array):
 func draw_attack_outlines(attackable_squares: Array):
 	for tile in attackable_squares:
 		set_cell(0, tile, 3, Vector2i(0, 0))
+
+## Highlights squares which an action allows to be selected.
+func draw_action_options(options:Array[Vector2i]):
+	clear()
+	print('emitted')
+	for tile in options:
+		set_cell(0, tile, 2, Vector2i(0, 0))
