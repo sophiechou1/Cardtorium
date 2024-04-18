@@ -309,7 +309,7 @@ func build_action_list():
 	# If so, builds the claim action
 	if game.board.territory[pos.x][pos.y] == owned_by:
 		var claim = Action.new()
-		claim.setup(claim_territory)
+		claim.setup(game, claim_territory)
 		claim.name = "Claim"
 		claim.description = "Claims territory in a 1-tile radius"
 		actions.append(claim)
@@ -324,15 +324,17 @@ func claim_territory():
 	game.claim_territory(pos, 1, owned_by)
 
 ## Runs a certain action
-func act(index: int):
+## Returns whether or not the action needs to wait on player input.
+func act(index: int) -> bool:
 	if index >= len(actions):
-		return
+		return false
 	elif not can_act:
-		return
+		return false
 	can_move = false
 	can_attack = false
 	can_act = false
-	actions[index].execute()
+	var input_needed = actions[index].execute()
 	if not can_act and not can_attack and not can_move:
 		game.troop_toggle_act.emit(self)
+	return input_needed
 

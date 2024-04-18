@@ -13,6 +13,8 @@ signal card_placed(card_index: int)
 @onready var action_bar = $GUI_Renderer/Control/ActionBar
 #@onready var ter_renderer = $TerrainRenderer
 var active_unit: Unit = null
+var action_input_wait: bool = false
+var action_input_options: Array[Vector2i] = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -41,11 +43,19 @@ func _ready():
 func on_card_selected(card_index: int):
 	selected_index = card_index
 		
+## Called when a tile is clicked
 func on_selected_tile(pos: Vector2i):
 	# Checks that the tile is in bounds
 	if (pos.x < 0 or pos.y < 0 or pos.x >= game.board.SIZE.x or pos.y >= game.board.SIZE.y):
 		return
 	selected_tile = pos
+	# Checks for action input
+	if action_input_wait:
+		if selected_tile in action_input_options:
+			action_input_wait = false
+			game.input_received.emit(selected_tile)
+		else:
+			return
 	# Checks if the tile selection was for the purpose of placing a card
 	check_and_place_card()
 
@@ -130,6 +140,8 @@ func check_and_place_card():
 
 ## Called when a player presses the end_turn button
 func on_turn_ended(prev_player: int, current_player: Player):
+	action_input_wait = false
+
 	deselect_unit()
 	
 ## Renders a troop card by adding it to the scene tree
@@ -147,6 +159,17 @@ func render_city(city: City):
 func troop_action(index: int):
 	if active_unit == null:
 		return
+	elif action_input_wait:
+		return
 	if active_unit.owned_by == game.board.territory[active_unit.pos.x][active_unit.pos.y]:
-		active_unit.act(index)
-	deselect_unit()
+		# Deselects unit if input is not necessary
+		# Otherwise waits for the player to click something
+		if not active_unit.act(index):
+			deselect_unit()
+		else:
+			action_input_wait = true
+
+## Called when an action requests user input
+func _on_game_input_requested(options:Array[Vector2i]):
+	action_input_options = options
+	move_renderer.draw_action_options(options)

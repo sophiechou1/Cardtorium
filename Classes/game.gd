@@ -29,6 +29,10 @@ signal city_placed(city: City)
 signal territory_claimed(claimed: Array[Vector2i], player_index: int)
 ## Emitted when a troop toggles between having actions it can take, and not
 signal troop_toggle_act(troop: Troop)
+## Emitted when the game needs the player to select a tile to continue
+signal input_requested(options: Array[Vector2i])
+## Emitted when the player makes a selection
+signal input_received(choice: Vector2i)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
