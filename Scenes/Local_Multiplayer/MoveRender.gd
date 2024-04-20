@@ -1,19 +1,11 @@
 extends TileMap
 
-## Render possible moves on the tilemap with outline
-func draw_move_outlines(possible_moves: Array):
-	clear()
-	for move_pos in possible_moves:
-		set_cell(0, move_pos, 2, Vector2i(0, 0))
-
 ## Highlights units that the troop can attack
-func draw_attack_outlines(attackable_squares: Array):
-	for tile in attackable_squares:
+func draw_red_outlines(tiles: Array):
+	for tile in tiles:
 		set_cell(0, tile, 3, Vector2i(0, 0))
 
 ## Highlights squares which an action allows to be selected.
-func draw_action_options(options:Array[Vector2i]):
-	clear()
-	print('emitted')
-	for tile in options:
+func draw_black_outlines(tiles:Array):
+	for tile in tiles:
 		set_cell(0, tile, 2, Vector2i(0, 0))

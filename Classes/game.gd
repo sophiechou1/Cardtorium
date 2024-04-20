@@ -53,26 +53,35 @@ func set_terrain(terrain: Board.Terrain, location: Array[Vector2i]):
 		board.tiles[position.x][position.y] = terrain
 	terrain_updated.emit(location, terrain)
 
-## Takes a card as input, and places that card at position x, y.
-func place_card(card: Card, x: int, y: int):
+## Takes a card as input, and creates a unit object from it
+func build_unit(card: Card) -> Unit:
 	match (card.type):
 		# Places a troop card
 		Card.CardType.TROOP:
 			var troop: Troop = Troop.new(self, card)
-			troop.owned_by = board.current_player
-			board.units[x][y] = troop
-			troop.pos = Vector2i(x, y)
-			troop_placed.emit(troop, Vector2i(x, y))
+			return troop
+	return null
+
+## Places a unit at position x, y
+func place_unit(unit: Unit, x: int, y: int):
+	match (unit.card_type):
+		Card.CardType.TROOP:
+			board.units[x][y] = unit
+			unit.pos = Vector2i(x, y)
+			unit.owned_by = board.current_player
+			troop_placed.emit(unit, Vector2i(x, y))
 
 ## Places the nth card in the player's hand onto the board at position x, y
-func place_from_hand(index: int, x: int, y: int):
+func place_from_hand(index: int, x: int, y: int, unit: Unit = null):
 	var player: Player = board.players[board.current_player]
 	var card: Card = player.hand[index]
 	if player.resources < card.cost:
 		return
 	player.remove_from_hand(index)
 	render_topbar.emit(board.turns, board.players[board.current_player])
-	self.place_card(card, x, y)
+	if unit == null:
+		unit = build_unit(card)
+	self.place_unit(unit, x, y)
 
 ## Goes to the next player's turn
 func end_turn():
