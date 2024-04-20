@@ -1,6 +1,6 @@
 extends Control
 @onready var back_button = $Back as Button
-@onready var items = $ScrollContainer/VBoxContainer/Items
+@onready var items = $ScrollContainer/Items
 var card_scene = preload ("res://Scenes/Card_Renderer/Card.tscn")
 var cardsize = Vector2(1205, 1576)
 var max_cards_per_hbox = 4
@@ -32,6 +32,7 @@ func add_card(card_data: Resource, card_index: int):
 		new_hbox()
 	var card = card_scene.instantiate()
 	current_hbox.add_child(card)
+	current_hbox.add_theme_constant_override("separation", 30)
 	card.setup(card_data, card_index)
 
 ## Creates a new hbox
