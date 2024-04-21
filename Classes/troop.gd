@@ -35,6 +35,8 @@ func _init(_game: Game, card: Card=null):
 	rng = base_stats.attack_range
 	health = base_stats.health
 	game.turn_ended.connect(reset)
+	owned_by = game.board.current_player
+	card_type = Card.CardType.TROOP
 	# Loads attributes
 	for attribute_id in self.base_stats.attributes:
 		var attribute_file = load('res://Attributes/Troops/Logic/attribute_{0}.gd'.format({0:attribute_id}))
@@ -337,4 +339,3 @@ func act(index: int) -> bool:
 	if not can_act and not can_attack and not can_move:
 		game.troop_toggle_act.emit(self)
 	return input_needed
-

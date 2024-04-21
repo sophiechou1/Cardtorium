@@ -15,6 +15,23 @@ signal card_placed(card_index: int)
 var active_unit: Unit = null
 var action_input_wait: bool = false
 var action_input_options: Array[Vector2i] = []
+var valid_tiles: Array[Vector2i] = []
+
+## States of the high-level state machine which represents the game
+enum States {
+	## Default state when nothing is selected
+	DEFAULT, 
+	## When a card in the hand is selected
+	CARD_SELECTED, 
+	## State when a unit on the board is selected
+	UNIT_SELECTED,
+	## State when a unit is awaiting input to perform an action
+	UNIT_ACTION_INPUT,
+	## State when an animation is playing
+	ANIMATION_PLAYING
+}
+## The current state of the game
+var state: States = States.DEFAULT
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -40,59 +57,65 @@ func _ready():
 	hand_renderer.card_selected.connect(self.on_card_selected)
 	game.turn_ended.connect(on_turn_ended)
 
+## Called when the user clicks on a card in their hand.
 func on_card_selected(card_index: int):
 	selected_index = card_index
+	active_unit = game.build_unit(game.board.players[game.board.current_player].hand[card_index])
+	valid_tiles = active_unit.get_placeable_tiles()
+	move_renderer.draw_black_outlines(valid_tiles)
+	state = States.CARD_SELECTED
 		
 ## Called when a tile is clicked
+## Behavior depends on the state
 func on_selected_tile(pos: Vector2i):
-	# Checks that the tile is in bounds
+	# Checks that the tile is in bounds. If not, return
 	if (pos.x < 0 or pos.y < 0 or pos.x >= game.board.SIZE.x or pos.y >= game.board.SIZE.y):
 		return
-	selected_tile = pos
-	# Checks for action input
-	if action_input_wait:
-		if selected_tile in action_input_options:
-			action_input_wait = false
-			game.input_received.emit(selected_tile)
-		else:
-			return
-	# Checks if the tile selection was for the purpose of placing a card
-	check_and_place_card()
-
-	# Checks if the clicked tile contains any units
-	var tile_content = game.board.units[selected_tile.x][selected_tile.y]
-	# Sets a new active unit
-	if tile_content != null and tile_content is Troop and active_unit == null:
-		if tile_content.owned_by != game.board.current_player:
-			return
-		var troop = tile_content as Troop
-		print_rich("[b]Name[/b]    : %s" % [troop.base_stats.name])
-		print_rich("[b]Health[/b]  : %d / %d" % [troop.health, troop.base_stats.health])
-		print_rich("[b]Attack[/b]  : %d" % [troop.attack])
-		print_rich("[b]Defense[/b] : %d\n" % [troop.defense])
-		select_unit(troop)
-		return
-	# Don't need to do anything if no unit selected
-	elif active_unit == null:
-		return
-	
-	# Checks for attacking
-	if active_unit is Troop and selected_tile in active_unit.attack_list:
-		# Checks for attacking a troop
-		if tile_content != null:
-			active_unit.attack_unit(tile_content)
+	# Handles the input
+	match state:
+		States.DEFAULT:
+			var troop = game.board.units[pos.x][pos.y]
+			# var building = game.board.buildings[pos.x][pos.y]
+			# Checks if selection was successful
+			select_unit(troop)
+			if active_unit != null:
+				state = States.UNIT_SELECTED
+		States.CARD_SELECTED:
+			if pos not in valid_tiles:
+				return
+			game.place_from_hand(selected_index, pos.x, pos.y, active_unit)
+			valid_tiles = []
+			move_renderer.clear()
+			active_unit = null
+			state = States.DEFAULT
+		States.UNIT_SELECTED:
+			if active_unit.card_type == Card.CardType.TROOP:
+				var troop: Troop = active_unit
+				if pos in troop.move_graph:
+					troop.move(pos)
+				elif pos in troop.attack_list:
+					var defender = game.board.units[pos.x][pos.y]
+					if defender != null:
+						troop.attack_unit(defender)
+					else:
+						troop.attack_unit(game.board.buildings[pos.x][pos.y])
 			deselect_unit()
-	# Checks for moving
-	elif active_unit is Troop and selected_tile in active_unit.move_graph:
-		active_unit.move(selected_tile)
-		deselect_unit()
-	# Deselect unit
-	else:
-		deselect_unit()
+			state = States.DEFAULT
+		States.UNIT_ACTION_INPUT:
+			if not pos in valid_tiles:
+				return
+			game.input_received.emit(pos)
+			move_renderer.clear()
+			deselect_unit()
 
-## Selects a unit
+## Attempts to select a unit
 func select_unit(unit: Unit):
+	if unit == null:
+		return
 	if unit is Troop:
+		# If the unit cannot do anything, return
+		if not (unit.can_act or unit.can_attack or unit.can_move):
+			return
 		# Sets active unit
 		active_unit = unit
 		# Builds the lists of a troop's potential actions
@@ -101,8 +124,8 @@ func select_unit(unit: Unit):
 		unit.build_attack_list()
 		# Renders the moves it can make
 		move_renderer.clear()
-		move_renderer.draw_move_outlines(unit.move_graph.keys()) # Draw move outlines
-		move_renderer.draw_attack_outlines(unit.attack_list.keys())
+		move_renderer.draw_black_outlines(unit.move_graph.keys()) # Draw move outlines
+		move_renderer.draw_red_outlines(unit.attack_list.keys())
 		# Displays actions it can take
 		var action_buttons: Array[Button] = action_bar.display_troop(unit)
 		for button in action_buttons:
@@ -118,30 +141,9 @@ func deselect_unit():
 	move_renderer.clear()
 	active_unit = null
 
-## Must first select card to place on a tile
-func check_and_place_card():
-	if selected_index != - 1:
-		if selected_tile != null:
-			var tile_content = game.board.units[selected_tile.x][selected_tile.y]
-			if tile_content != null and tile_content is Troop:
-				# Troop already exists on the selected tile, don't allow card placement
-				return
-			if not game.board.buildings[selected_tile.x][selected_tile.y] is City:
-				return
-			var current_player = game.board.current_player
-			if not game.board.territory[selected_tile.x][selected_tile.y] == current_player:
-				return
-			game.place_from_hand(selected_index, selected_tile.x, selected_tile.y)
-			selected_index = -1
-			selected_tile = Vector2i()
-		else:
-			# Deselect any selected tile
-			selected_tile = Vector2i()
-
 ## Called when a player presses the end_turn button
 func on_turn_ended(prev_player: int, current_player: Player):
 	action_input_wait = false
-
 	deselect_unit()
 	
 ## Renders a troop card by adding it to the scene tree
@@ -159,17 +161,16 @@ func render_city(city: City):
 func troop_action(index: int):
 	if active_unit == null:
 		return
-	elif action_input_wait:
+	elif state == States.UNIT_ACTION_INPUT:
 		return
-	if active_unit.owned_by == game.board.territory[active_unit.pos.x][active_unit.pos.y]:
-		# Deselects unit if input is not necessary
-		# Otherwise waits for the player to click something
-		if not active_unit.act(index):
-			deselect_unit()
-		else:
-			action_input_wait = true
+	# Checks if the action requires user input
+	if not active_unit.act(index):
+		deselect_unit()
+		state = States.DEFAULT
+	else:
+		state = States.UNIT_ACTION_INPUT
 
 ## Called when an action requests user input
 func _on_game_input_requested(options:Array[Vector2i]):
-	action_input_options = options
-	move_renderer.draw_action_options(options)
+	valid_tiles = options
+	move_renderer.draw_black_outlines(options)
