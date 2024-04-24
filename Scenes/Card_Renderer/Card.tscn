@@ -15,16 +15,16 @@ bg_color = Color(0.992157, 1, 0, 1)
 
 [node name="MarginContainer" type="MarginContainer"]
 texture_filter = 2
-custom_minimum_size = Vector2(400, 500)
+custom_minimum_size = Vector2(1280, 1560)
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -576.0
+offset_left = -616.0
 offset_top = -324.0
-offset_right = 629.0
-offset_bottom = 1243.0
+offset_right = 669.0
+offset_bottom = 1236.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_mhkcl")
@@ -167,13 +167,14 @@ vertical_alignment = 1
 layout_mode = 2
 theme_override_colors/font_color = Color(0.980392, 0, 0, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
-theme_override_constants/shadow_offset_x = 2
-theme_override_constants/shadow_offset_y = 2
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 0
 theme_override_constants/shadow_outline_size = 4
 theme_override_font_sizes/font_size = 130
 text = "NAME"
 horizontal_alignment = 1
 vertical_alignment = 1
+text_overrun_behavior = 3
 
 [node name="MarginContainer" type="MarginContainer" parent="MarginContainer2/VBoxContainer"]
 layout_mode = 2
